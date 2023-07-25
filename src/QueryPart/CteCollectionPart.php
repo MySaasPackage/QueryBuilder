@@ -20,6 +20,11 @@ class CteCollectionPart implements Stringable
         return $this;
     }
 
+    public function isNotEmpty(): bool
+    {
+        return 0 !== count($this->ctes);
+    }
+
     public function __toString()
     {
         if (0 === count($this->ctes)) {

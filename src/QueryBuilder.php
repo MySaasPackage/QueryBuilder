@@ -29,10 +29,6 @@ class QueryBuilder implements Stringable
 
     public const TYPE = 'type';
     public const SELECT = 'select';
-    public const WHERE = 'where';
-    public const RETURNING = 'returning';
-    public const ORDER_BY = 'order_by';
-    public const GROUP_BY = 'group_by';
 
     public function __construct()
     {
@@ -40,6 +36,11 @@ class QueryBuilder implements Stringable
         $this->parts[CteCollectionPart::class] = new CteCollectionPart();
         $this->parts[WhereCollectionPart::class] = new WhereCollectionPart();
         $this->parts[OrderByCollectionPart::class] = new OrderByCollectionPart();
+    }
+
+    public static function create(): self
+    {
+        return new self();
     }
 
     public function select(array $columns = []): self
@@ -212,22 +213,22 @@ class QueryBuilder implements Stringable
 
         $sql = "SELECT {$columns} FROM {$table}";
 
-        if ($this->parts[CteCollectionPart::class]->__toString()) {
+        if ($this->parts[CteCollectionPart::class]->isNotEmpty()) {
             $ctes = $this->parts[CteCollectionPart::class]->__toString();
             $sql = "{$ctes} {$sql}";
         }
 
-        if ($this->parts[JoinPartCollection::class]) {
-            $join = $this->parts[JoinPartCollection::class]->__toString();
+        if ($this->parts[JoinCollectionPart::class]->isNotEmpty()) {
+            $join = $this->parts[JoinCollectionPart::class]->__toString();
             $sql = "{$sql} {$join}";
         }
 
-        if ($this->parts[WhereCollectionPart::class]->__toString()) {
+        if ($this->parts[WhereCollectionPart::class]->isNotEmpty()) {
             $wheres = $this->parts[WhereCollectionPart::class]->__toString();
             $sql = "{$sql} {$wheres}";
         }
 
-        if ($this->parts[OrderByCollectionPart::class]) {
+        if ($this->parts[OrderByCollectionPart::class]->isNotEmpty()) {
             $orderBy = $this->parts[OrderByCollectionPart::class]->__toString();
             $sql = "{$sql} {$orderBy}";
         }

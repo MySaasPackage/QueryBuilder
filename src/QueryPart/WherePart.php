@@ -16,10 +16,12 @@ class WherePart implements Stringable
 
     public function __toString(): string
     {
+        $sanitized = preg_replace('/"/', '\'', $this->condition);
+
         if (null === $this->type) {
-            return $this->condition;
+            return $sanitized;
         }
 
-        return sprintf('%s %s', $this->type->value, $this->condition);
+        return sprintf('%s %s', $this->type->value, $sanitized);
     }
 }
