@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
+use MySaasPackage\Support\QueryBuilder;
+
 class ParamPart implements Part
 {
     public readonly mixed $value;
@@ -17,6 +19,13 @@ class ParamPart implements Part
 
     public function sanitize(mixed $value): mixed
     {
+        if ($value instanceof QueryBuilder) {
+            return sprintf('(%s)', strval($value));
+        }
+
+        if ($value instanceof Part) {
+            return strval($value);
+        }
         if (is_int($value) || ctype_digit($value)) {
             return intval($value);
         }

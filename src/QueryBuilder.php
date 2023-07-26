@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support;
 
-use Stringable;
 use RuntimeException;
+use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\CtePart;
 use MySaasPackage\Support\QueryPart\JoinPart;
 use MySaasPackage\Support\QueryPart\JoinType;
@@ -28,7 +28,7 @@ use MySaasPackage\Support\QueryPart\WhereCollectionPart;
 use MySaasPackage\Support\QueryPart\ParamsCollectionPart;
 use MySaasPackage\Support\QueryPart\OrderByCollectionPart;
 
-class QueryBuilder implements Stringable
+class QueryBuilder implements Part
 {
     protected array $parts = [];
 
@@ -40,11 +40,6 @@ class QueryBuilder implements Stringable
 
     public function __construct()
     {
-        $this->parts[JoinCollectionPart::class] = new JoinCollectionPart();
-        $this->parts[CteCollectionPart::class] = new CteCollectionPart();
-        $this->parts[WhereCollectionPart::class] = new WhereCollectionPart();
-        $this->parts[OrderByCollectionPart::class] = new OrderByCollectionPart();
-        $this->parts[ParamsCollectionPart::class] = new ParamsCollectionPart();
     }
 
     public static function create(): self
@@ -52,7 +47,7 @@ class QueryBuilder implements Stringable
         return new self();
     }
 
-    public function select(array $columns = []): self
+    public function select(array $columns = ['*']): self
     {
         $this->parts[self::TYPE] = self::SELECT;
         $this->parts[ColumnsPart::class] = new ColumnsPart($columns);
@@ -60,10 +55,9 @@ class QueryBuilder implements Stringable
         return $this;
     }
 
-    public function insert(string $table = null): self
+    public function insert(string $table): self
     {
         $this->parts[self::TYPE] = self::INSERT;
-
         $this->parts[TablePart::class] = new TablePart($table);
 
         return $this;
@@ -71,7 +65,6 @@ class QueryBuilder implements Stringable
 
     public function into(string $table): self
     {
-        $this->parts[self::TYPE] = self::INSERT;
         $this->parts[TablePart::class] = new TablePart($table);
 
         return $this;
@@ -79,26 +72,30 @@ class QueryBuilder implements Stringable
 
     public function values(array $values = []): self
     {
-        $this->parts[self::TYPE] = self::INSERT;
+        if (self::INSERT !== $this->parts[self::TYPE]) {
+            throw new RuntimeException('You can only use values() with insert()');
+        }
+
         $this->parts[ColumnsPart::class] = new ColumnsPart(array_keys($values));
         $this->parts[ValuesPart::class] = new ValuesPart(array_values($values));
 
         return $this;
     }
 
-    public function update(string $table, array $columns = []): self
+    public function update(string $table): self
     {
         $this->parts[self::TYPE] = self::UPDATE;
         $this->parts[TablePart::class] = new TablePart($table);
-        $this->parts[ColumnsPart::class] = new ColumnsPart($columns);
-        $this->parts[ColumnsPart::class] = new ColumnsPart($columns);
 
         return $this;
     }
 
     public function set(array $values = []): self
     {
-        $this->parts[self::TYPE] = self::UPDATE;
+        if (self::UPDATE !== $this->parts[self::TYPE]) {
+            throw new RuntimeException('You can only use set() with update()');
+        }
+
         $this->parts[UpdateSetValuesPart::class] = new UpdateSetValuesPart($values);
 
         return $this;
@@ -127,6 +124,7 @@ class QueryBuilder implements Stringable
 
     protected function addParam(ParamPart $param): self
     {
+        $this->parts[ParamsCollectionPart::class] ??= new ParamsCollectionPart();
         $this->parts[ParamsCollectionPart::class]->add($param);
 
         return $this;
@@ -141,6 +139,7 @@ class QueryBuilder implements Stringable
 
     protected function addWhere(WherePart $wherePart): self
     {
+        $this->parts[WhereCollectionPart::class] ??= new WhereCollectionPart();
         $this->parts[WhereCollectionPart::class]->add($wherePart);
 
         return $this;
@@ -176,6 +175,7 @@ class QueryBuilder implements Stringable
 
     protected function addJoin(JoinPart $join): self
     {
+        $this->parts[JoinCollectionPart::class] ??= new JoinCollectionPart();
         $this->parts[JoinCollectionPart::class]->add($join);
 
         return $this;
@@ -227,6 +227,7 @@ class QueryBuilder implements Stringable
 
     protected function addOrderBy(OrderByPart $orderBy): self
     {
+        $this->parts[OrderByCollectionPart::class] ??= new OrderByCollectionPart();
         $this->parts[OrderByCollectionPart::class]->add($orderBy);
 
         return $this;
@@ -268,6 +269,7 @@ class QueryBuilder implements Stringable
 
     protected function addCte(CtePart $cte): self
     {
+        $this->parts[CteCollectionPart::class] ??= new CteCollectionPart();
         $this->parts[CteCollectionPart::class]->add($cte);
 
         return $this;
@@ -282,6 +284,7 @@ class QueryBuilder implements Stringable
 
     protected function bindParamsParts(string $sql): string
     {
+        $this->parts[ParamsCollectionPart::class] ??= new ParamsCollectionPart();
         $params = $this->parts[ParamsCollectionPart::class]->params;
 
         foreach ($params as $param) {
@@ -298,22 +301,22 @@ class QueryBuilder implements Stringable
 
         $sql = "SELECT {$columns} FROM {$table}";
 
-        if ($this->parts[CteCollectionPart::class]->isNotEmpty()) {
+        if (isset($this->parts[CteCollectionPart::class]) && $this->parts[CteCollectionPart::class]->isNotEmpty()) {
             $ctes = $this->parts[CteCollectionPart::class]->__toString();
             $sql = "{$ctes} {$sql}";
         }
 
-        if ($this->parts[JoinCollectionPart::class]->isNotEmpty()) {
+        if (isset($this->parts[joincollectionpart::class]) && $this->parts[joincollectionpart::class]->isNotEmpty()) {
             $join = $this->parts[JoinCollectionPart::class]->__toString();
             $sql = "{$sql} {$join}";
         }
 
-        if ($this->parts[WhereCollectionPart::class]->isNotEmpty()) {
+        if (isset($this->parts[WhereCollectionPart::class]) && $this->parts[WhereCollectionPart::class]->isNotEmpty()) {
             $wheres = $this->parts[WhereCollectionPart::class]->__toString();
             $sql = "{$sql} {$wheres}";
         }
 
-        if ($this->parts[OrderByCollectionPart::class]->isNotEmpty()) {
+        if (isset($this->parts[OrderByCollectionPart::class]) && $this->parts[OrderByCollectionPart::class]->isNotEmpty()) {
             $orderBy = $this->parts[OrderByCollectionPart::class]->__toString();
             $sql = "{$sql} {$orderBy}";
         }
@@ -364,7 +367,7 @@ class QueryBuilder implements Stringable
 
         $sql = "UPDATE {$table} SET {$set}";
 
-        if ($this->parts[WhereCollectionPart::class]->isNotEmpty()) {
+        if (isset($this->parts[WhereCollectionPart::class]) && $this->parts[WhereCollectionPart::class]->isNotEmpty()) {
             $wheres = $this->parts[WhereCollectionPart::class]->__toString();
             $sql = "{$sql} {$wheres}";
         }
@@ -383,7 +386,7 @@ class QueryBuilder implements Stringable
 
         $sql = "DELETE FROM {$table}";
 
-        if ($this->parts[WhereCollectionPart::class]->isNotEmpty()) {
+        if (isset($this->parts[WhereCollectionPart::class]) && $this->parts[WhereCollectionPart::class]->isNotEmpty()) {
             $wheres = $this->parts[WhereCollectionPart::class]->__toString();
             $sql = "{$sql} {$wheres}";
         }

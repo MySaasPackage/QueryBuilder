@@ -11,12 +11,19 @@ class ColumnsPart implements Part
     ) {
     }
 
+    public function fromRawArray(array $columns): self
+    {
+        return new self(array_map(fn ($column) => new ColumnPart($column), $columns));
+    }
+
     public function __toString(): string
     {
         if (0 === count($this->columns)) {
             return '*';
         }
 
-        return implode(', ', array_map(fn ($column) => strtolower(trim($column)), $this->columns));
+        $columns = array_map(fn ($column) => $column, $this->columns);
+
+        return implode(', ', $columns);
     }
 }
