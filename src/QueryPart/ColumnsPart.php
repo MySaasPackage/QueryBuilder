@@ -11,7 +11,7 @@ class ColumnsPart implements Part
     ) {
     }
 
-    public function fromRawArray(array $columns): self
+    public static function fromRawArray(array $columns): self
     {
         return new self(array_map(fn ($column) => new ColumnPart($column), $columns));
     }
@@ -22,7 +22,7 @@ class ColumnsPart implements Part
             return '*';
         }
 
-        $columns = array_map(fn ($column) => $column, $this->columns);
+        $columns = array_map(fn ($column) => strval($column), $this->columns);
 
         return implode(', ', $columns);
     }

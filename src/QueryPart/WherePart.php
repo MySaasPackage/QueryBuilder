@@ -14,12 +14,12 @@ class WherePart implements Part
 
     public function __toString(): string
     {
-        $sanitized = preg_replace('/"/', '\'', $this->condition);
+        $sanitizedConditional = preg_replace('/"/', '\'', $this->condition);
 
         if (null === $this->type) {
-            return $sanitized;
+            return $sanitizedConditional;
         }
 
-        return sprintf('%s %s', $this->type->value, $sanitized);
+        return sprintf('%s %s', $this->type->value, $sanitizedConditional);
     }
 }

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-class OrderByCollectionPart implements Part
+class JoinPartCollection implements Part
 {
     public function __construct(
         protected array $parts = []
     ) {
     }
 
-    public function add(OrderByPart $part): void
+    public function add(JoinPart $part): void
     {
         $this->parts[] = $part;
     }
@@ -27,6 +27,6 @@ class OrderByCollectionPart implements Part
             return '';
         }
 
-        return 'ORDER BY ' . implode(' ', $this->parts);
+        return implode(' ', $this->parts);
     }
 }

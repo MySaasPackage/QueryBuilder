@@ -16,13 +16,13 @@ class ColumnPart implements Part
     public function __toString(): string
     {
         if ($this->value instanceof QueryBuilder) {
-            return sprintf('(%s)', strval($this->value));
+            return sprintf('(%s)', $this->value->__toString());
         }
 
         if ($this->value instanceof Part) {
-            return strval($this->value);
+            return $this->value->__toString();
         }
 
-        return $this->value;
+        return strval($this->value);
     }
 }

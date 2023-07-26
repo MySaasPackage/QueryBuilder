@@ -13,6 +13,6 @@ class ValuesPart implements Part
 
     public function __toString(): string
     {
-        return implode(', ', array_map(fn ($column) => strtolower(trim($column)), $this->columns));
+        return 'VALUES (' . implode(', ', array_map(fn ($column) => strtolower(trim($column)), $this->columns)) . ')';
     }
 }

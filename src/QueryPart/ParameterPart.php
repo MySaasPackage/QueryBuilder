@@ -6,26 +6,27 @@ namespace MySaasPackage\Support\QueryPart;
 
 use MySaasPackage\Support\QueryBuilder;
 
-class ParamPart implements Part
+class ParameterPart implements Part
 {
     public readonly mixed $value;
 
     public function __construct(
-        public readonly string $name,
+        public readonly string|int $key,
         mixed $value
     ) {
-        $this->value = $this->sanitize($value);
+        $this->value = $this->stringify($value);
     }
 
-    public function sanitize(mixed $value): mixed
+    protected function stringify(mixed $value): mixed
     {
         if ($value instanceof QueryBuilder) {
-            return sprintf('(%s)', strval($value));
+            return sprintf('(%s)', $value->__toString());
         }
 
         if ($value instanceof Part) {
-            return strval($value);
+            return $value->__toString();
         }
+
         if (is_int($value) || ctype_digit($value)) {
             return intval($value);
         }
@@ -43,7 +44,7 @@ class ParamPart implements Part
         }
 
         if (is_array($value)) {
-            return sprintf('(%s)', implode(', ', array_map(fn (mixed $element) => $this->sanitize($element), $value)));
+            return sprintf('(%s)', implode(', ', array_map(fn (mixed $element) => $this->stringify($element), $value)));
         }
 
         return $value;

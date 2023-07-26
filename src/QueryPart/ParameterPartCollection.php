@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-class ParamsCollectionPart
+class ParameterPartCollection
 {
     public function __construct(
         public array $params = []
     ) {
     }
 
-    public function add(ParamPart $param): self
+    public function add(ParameterPart $param): self
     {
         $this->params[] = $param;
 

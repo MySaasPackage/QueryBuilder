@@ -10,7 +10,6 @@ use MySaasPackage\Support\QueryPart\CtePart;
 use MySaasPackage\Support\QueryPart\JoinPart;
 use MySaasPackage\Support\QueryPart\JoinType;
 use MySaasPackage\Support\QueryPart\LimitPart;
-use MySaasPackage\Support\QueryPart\ParamPart;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\WherePart;
 use MySaasPackage\Support\QueryPart\WhereType;
@@ -20,13 +19,14 @@ use MySaasPackage\Support\QueryPart\GroupByPart;
 use MySaasPackage\Support\QueryPart\OrderByPart;
 use MySaasPackage\Support\QueryPart\OrderByType;
 use MySaasPackage\Support\QueryPart\HavingByPart;
+use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
-use MySaasPackage\Support\QueryPart\CteCollectionPart;
-use MySaasPackage\Support\QueryPart\JoinCollectionPart;
+use MySaasPackage\Support\QueryPart\CtePartCollection;
+use MySaasPackage\Support\QueryPart\JoinPartCollection;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
 use MySaasPackage\Support\QueryPart\WhereCollectionPart;
-use MySaasPackage\Support\QueryPart\ParamsCollectionPart;
-use MySaasPackage\Support\QueryPart\OrderByCollectionPart;
+use MySaasPackage\Support\QueryPart\OrderByPartCollection;
+use MySaasPackage\Support\QueryPart\ParameterPartCollection;
 
 class QueryBuilder implements Part
 {
@@ -50,7 +50,7 @@ class QueryBuilder implements Part
     public function select(array $columns = ['*']): self
     {
         $this->parts[self::TYPE] = self::SELECT;
-        $this->parts[ColumnsPart::class] = new ColumnsPart($columns);
+        $this->parts[ColumnsPart::class] = ColumnsPart::fromRawArray($columns);
 
         return $this;
     }
@@ -76,7 +76,7 @@ class QueryBuilder implements Part
             throw new RuntimeException('You can only use values() with insert()');
         }
 
-        $this->parts[ColumnsPart::class] = new ColumnsPart(array_keys($values));
+        $this->parts[ColumnsPart::class] = ColumnsPart::fromRawArray(array_keys($values));
         $this->parts[ValuesPart::class] = new ValuesPart(array_values($values));
 
         return $this;
@@ -122,17 +122,17 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    protected function addParam(ParamPart $param): self
+    protected function addParam(ParameterPart $param): self
     {
-        $this->parts[ParamsCollectionPart::class] ??= new ParamsCollectionPart();
-        $this->parts[ParamsCollectionPart::class]->add($param);
+        $this->parts[ParameterPartCollection::class] ??= new ParameterPartCollection();
+        $this->parts[ParameterPartCollection::class]->add($param);
 
         return $this;
     }
 
-    public function bind(string $key, $value): self
+    public function setParameter(string|int $key, $value): self
     {
-        $this->addParam(new ParamPart($key, $value));
+        $this->addParam(new ParameterPart($key, $value));
 
         return $this;
     }
@@ -175,8 +175,8 @@ class QueryBuilder implements Part
 
     protected function addJoin(JoinPart $join): self
     {
-        $this->parts[JoinCollectionPart::class] ??= new JoinCollectionPart();
-        $this->parts[JoinCollectionPart::class]->add($join);
+        $this->parts[JoinPartCollection::class] ??= new JoinPartCollection();
+        $this->parts[JoinPartCollection::class]->add($join);
 
         return $this;
     }
@@ -227,8 +227,8 @@ class QueryBuilder implements Part
 
     protected function addOrderBy(OrderByPart $orderBy): self
     {
-        $this->parts[OrderByCollectionPart::class] ??= new OrderByCollectionPart();
-        $this->parts[OrderByCollectionPart::class]->add($orderBy);
+        $this->parts[OrderByPartCollection::class] ??= new OrderByPartCollection();
+        $this->parts[OrderByPartCollection::class]->add($orderBy);
 
         return $this;
     }
@@ -269,8 +269,8 @@ class QueryBuilder implements Part
 
     protected function addCte(CtePart $cte): self
     {
-        $this->parts[CteCollectionPart::class] ??= new CteCollectionPart();
-        $this->parts[CteCollectionPart::class]->add($cte);
+        $this->parts[CtePartCollection::class] ??= new CtePartCollection();
+        $this->parts[CtePartCollection::class]->add($cte);
 
         return $this;
     }
@@ -282,19 +282,28 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    protected function bindParamsParts(string $sql): string
+    protected function bindParameterParts(string $sql): string
     {
-        if (!isset($this->parts[ParamsCollectionPart::class])) {
+        if (!isset($this->parts[ParameterPartCollection::class])) {
             return $sql;
         }
 
-        $params = $this->parts[ParamsCollectionPart::class]->params;
+        $params = $this->parts[ParameterPartCollection::class]->params;
+
+        $patterns = [];
+        $replacements = [];
 
         foreach ($params as $param) {
-            $sql = preg_replace(sprintf('/:%s/', $param->name), strval($param->value), $sql);
+            if (is_int($param->key)) {
+                $patterns[] = '/\?/';
+            } else {
+                $patterns[] = sprintf('/:%s/', $param->key);
+            }
+
+            $replacements[] = strval($param->value);
         }
 
-        return $sql;
+        return preg_replace($patterns, $replacements, $sql, 1);
     }
 
     public function __toSelect(): string
@@ -304,13 +313,13 @@ class QueryBuilder implements Part
 
         $sql = "SELECT {$columns} FROM {$table}";
 
-        if (isset($this->parts[CteCollectionPart::class]) && $this->parts[CteCollectionPart::class]->isNotEmpty()) {
-            $ctes = $this->parts[CteCollectionPart::class]->__toString();
+        if (isset($this->parts[CtePartCollection::class]) && $this->parts[CtePartCollection::class]->isNotEmpty()) {
+            $ctes = $this->parts[CtePartCollection::class]->__toString();
             $sql = "{$ctes} {$sql}";
         }
 
-        if (isset($this->parts[joincollectionpart::class]) && $this->parts[joincollectionpart::class]->isNotEmpty()) {
-            $join = $this->parts[JoinCollectionPart::class]->__toString();
+        if (isset($this->parts[JoinPartCollection::class]) && $this->parts[JoinPartCollection::class]->isNotEmpty()) {
+            $join = $this->parts[JoinPartCollection::class]->__toString();
             $sql = "{$sql} {$join}";
         }
 
@@ -319,8 +328,8 @@ class QueryBuilder implements Part
             $sql = "{$sql} {$wheres}";
         }
 
-        if (isset($this->parts[OrderByCollectionPart::class]) && $this->parts[OrderByCollectionPart::class]->isNotEmpty()) {
-            $orderBy = $this->parts[OrderByCollectionPart::class]->__toString();
+        if (isset($this->parts[OrderByPartCollection::class]) && $this->parts[OrderByPartCollection::class]->isNotEmpty()) {
+            $orderBy = $this->parts[OrderByPartCollection::class]->__toString();
             $sql = "{$sql} {$orderBy}";
         }
 
@@ -353,7 +362,7 @@ class QueryBuilder implements Part
         $columns = $this->parts[ColumnsPart::class]->__toString();
         $values = $this->parts[ValuesPart::class]->__toString();
 
-        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$values})";
+        $sql = "INSERT INTO {$table} ({$columns}) {$values}";
 
         if (isset($this->parts[ReturningPart::class])) {
             $returning = $this->parts[ReturningPart::class]->__toString();
@@ -368,7 +377,7 @@ class QueryBuilder implements Part
         $table = $this->parts[TablePart::class]->__toString();
         $set = $this->parts[UpdateSetValuesPart::class]->__toString();
 
-        $sql = "UPDATE {$table} SET {$set}";
+        $sql = "UPDATE {$table} {$set}";
 
         if (isset($this->parts[WhereCollectionPart::class]) && $this->parts[WhereCollectionPart::class]->isNotEmpty()) {
             $wheres = $this->parts[WhereCollectionPart::class]->__toString();
@@ -405,19 +414,19 @@ class QueryBuilder implements Part
     public function __toString(): string
     {
         if (self::SELECT === $this->parts[self::TYPE]) {
-            return $this->bindParamsParts($this->__toSelect());
+            return $this->bindParameterParts($this->__toSelect());
         }
 
         if (self::INSERT === $this->parts[self::TYPE]) {
-            return $this->bindParamsParts($this->__toInsert());
+            return $this->bindParameterParts($this->__toInsert());
         }
 
         if (self::UPDATE === $this->parts[self::TYPE]) {
-            return $this->bindParamsParts($this->__toUpdate());
+            return $this->bindParameterParts($this->__toUpdate());
         }
 
         if (self::DELETE === $this->parts[self::TYPE]) {
-            return $this->bindParamsParts($this->__toDelete());
+            return $this->bindParameterParts($this->__toDelete());
         }
 
         return throw new RuntimeException('Query type not supported');

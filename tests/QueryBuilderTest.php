@@ -24,7 +24,7 @@ final class QueryBuilderTest extends TestCase
             ->orderBy(['id', 'name', 'email'], 'DESC')
             ->having('COUNT(*) > 1')
             ->limit(10)
-            ->bind('name', 'John');
+            ->setParameter('name', 'John');
 
         $this->assertEqualsIgnoringCase('SELECT id as user__id, name, email FROM users', $userCTE->__toString());
         $this->assertEqualsIgnoringCase('SELECT id as user__id, name, email FROM profile RETURNING id as profile__id, user_id, address', $profileCTE->__toString());
@@ -36,13 +36,15 @@ final class QueryBuilderTest extends TestCase
         $query = QueryBuilder::create()
             ->insert('users')
             ->values([
-                'name' => ':name',
-                'email' => ':email',
+                'name' => '?',
+                'email' => '?',
+                'phone' => '?',
             ])
-            ->bind('name', 'John')
-            ->bind('email', 'alef@gmail.com');
+            ->setParameter(0, 'John')
+            ->setParameter(1, 'alef@gmail.com')
+            ->setParameter(2, '+234567890');
 
-        $this->assertEqualsIgnoringCase('INSERT INTO users (name, email) VALUES (\'John\', \'alef@gmail.com\')', $query->__toString());
+        $this->assertEqualsIgnoringCase('INSERT INTO users (name, email, phone) VALUES (\'John\', \'alef@gmail.com\', \'+234567890\')', $query->__toString());
     }
 
     public function testUpdateSuccessful(): void
@@ -51,9 +53,9 @@ final class QueryBuilderTest extends TestCase
             ->update('users')
             ->set(['name' => ':name', 'email' => ':email'])
             ->where('id = :id')
-            ->bind('name', 'John')
-            ->bind('email', 'john@gmail.com')
-            ->bind('id', 1);
+            ->setParameter('name', 'John')
+            ->setParameter('email', 'john@gmail.com')
+            ->setParameter('id', 1);
 
         $this->assertEqualsIgnoringCase('UPDATE users SET name = \'John\', email = \'john@gmail.com\' WHERE id = 1', $query->__toString());
     }

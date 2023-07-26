@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-class CteCollectionPart implements Part
+class CtePartCollection implements Part
 {
     public function __construct(
         public array $ctes = []
