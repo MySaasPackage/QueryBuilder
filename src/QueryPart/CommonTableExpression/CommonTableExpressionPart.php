@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\Support\QueryPart\CommonTableExpression;
 
 use MySaasPackage\Support\QueryBuilder;
+use MySaasPackage\Support\QueryPart\Part;
 
-class CtePart implements Part
+class CommonTableExpressionPart implements Part
 {
     public function __construct(
         public readonly string $alias,

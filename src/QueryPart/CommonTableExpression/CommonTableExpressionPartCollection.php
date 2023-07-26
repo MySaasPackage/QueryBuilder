@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\Support\QueryPart\CommonTableExpression;
 
-class CtePartCollection implements Part
+use MySaasPackage\Support\QueryPart\Part;
+
+class CommonTableExpressionPartCollection implements Part
 {
     public function __construct(
         public array $ctes = []
     ) {
     }
 
-    public function add(CtePart $cte): self
+    public function add(CommonTableExpressionPart $cte): self
     {
         $this->ctes[] = $cte;
 

@@ -6,7 +6,6 @@ namespace MySaasPackage\Support;
 
 use RuntimeException;
 use MySaasPackage\Support\QueryPart\Part;
-use MySaasPackage\Support\QueryPart\CtePart;
 use MySaasPackage\Support\QueryPart\LimitPart;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\ColumnPart;
@@ -19,15 +18,16 @@ use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
 use MySaasPackage\Support\QueryPart\Join\JoinTrait;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
-use MySaasPackage\Support\QueryPart\CtePartCollection;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
 use MySaasPackage\Support\QueryPart\OrderByPartCollection;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
+use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionTrait;
 
 class QueryBuilder implements Part
 {
     use WhereTrait;
     use JoinTrait;
+    use CommonTableExpressionTrait;
 
     protected array $parts = [];
 
@@ -189,21 +189,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    protected function addCte(CtePart $cte): self
-    {
-        $this->parts[CtePartCollection::class] ??= new CtePartCollection();
-        $this->parts[CtePartCollection::class]->add($cte);
-
-        return $this;
-    }
-
-    public function with(string $alias, QueryBuilder $query): self
-    {
-        $this->addCte(new CtePart(alias: $alias, query: $query));
-
-        return $this;
-    }
-
     protected function bindParameterParts(string $sql): string
     {
         if (!isset($this->parts[ParameterPartCollection::class])) {
@@ -235,9 +220,8 @@ class QueryBuilder implements Part
 
         $sql = "SELECT {$columns} FROM {$table}";
 
-        if (isset($this->parts[CtePartCollection::class]) && $this->parts[CtePartCollection::class]->isNotEmpty()) {
-            $ctes = $this->parts[CtePartCollection::class]->__toString();
-            $sql = "{$ctes} {$sql}";
+        if ($this->commonTableExpressionPartCollection) {
+            $sql = "{$this->__toCommonTableExpression()} {$sql}";
         }
 
         if ($this->joinPartCollection) {
