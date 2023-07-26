@@ -284,7 +284,10 @@ class QueryBuilder implements Part
 
     protected function bindParamsParts(string $sql): string
     {
-        $this->parts[ParamsCollectionPart::class] ??= new ParamsCollectionPart();
+        if (!isset($this->parts[ParamsCollectionPart::class])) {
+            return $sql;
+        }
+
         $params = $this->parts[ParamsCollectionPart::class]->params;
 
         foreach ($params as $param) {
