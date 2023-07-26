@@ -8,7 +8,7 @@ class WherePart implements Part
 {
     public function __construct(
         public readonly string $condition,
-        public readonly WhereType|null $type = null
+        public readonly Where|null $type = null
     ) {
     }
 

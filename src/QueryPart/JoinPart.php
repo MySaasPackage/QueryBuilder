@@ -7,7 +7,7 @@ namespace MySaasPackage\Support\QueryPart;
 class JoinPart implements Part
 {
     public function __construct(
-        public readonly JoinType $type,
+        public readonly Join $type,
         public readonly TablePart $table,
         public readonly string $condition
     ) {

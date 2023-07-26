@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace MySaasPackage\Support;
 
 use RuntimeException;
+use MySaasPackage\Support\QueryPart\Join;
 use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\Where;
 use MySaasPackage\Support\QueryPart\CtePart;
 use MySaasPackage\Support\QueryPart\OrderBy;
 use MySaasPackage\Support\QueryPart\JoinPart;
-use MySaasPackage\Support\QueryPart\JoinType;
 use MySaasPackage\Support\QueryPart\LimitPart;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\WherePart;
-use MySaasPackage\Support\QueryPart\WhereType;
 use MySaasPackage\Support\QueryPart\ValuesPart;
 use MySaasPackage\Support\QueryPart\ColumnsPart;
 use MySaasPackage\Support\QueryPart\GroupByPart;
@@ -24,7 +24,7 @@ use MySaasPackage\Support\QueryPart\ReturningPart;
 use MySaasPackage\Support\QueryPart\CtePartCollection;
 use MySaasPackage\Support\QueryPart\JoinPartCollection;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
-use MySaasPackage\Support\QueryPart\WhereCollectionPart;
+use MySaasPackage\Support\QueryPart\WherePartCollection;
 use MySaasPackage\Support\QueryPart\OrderByPartCollection;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
 
@@ -139,8 +139,8 @@ class QueryBuilder implements Part
 
     protected function addWhere(WherePart $wherePart): self
     {
-        $this->parts[WhereCollectionPart::class] ??= new WhereCollectionPart();
-        $this->parts[WhereCollectionPart::class]->add($wherePart);
+        $this->parts[WherePartCollection::class] ??= new WherePartCollection();
+        $this->parts[WherePartCollection::class]->add($wherePart);
 
         return $this;
     }
@@ -154,14 +154,14 @@ class QueryBuilder implements Part
 
     public function andWhere(string $condition): self
     {
-        $this->addWhere(new WherePart($condition, WhereType::And));
+        $this->addWhere(new WherePart($condition, Where::AND));
 
         return $this;
     }
 
     public function orWhere(string $condition): self
     {
-        $this->addWhere(new WherePart($condition, WhereType::Or));
+        $this->addWhere(new WherePart($condition, Where::Or));
 
         return $this;
     }
@@ -184,7 +184,7 @@ class QueryBuilder implements Part
     public function join(string $table, string $alias, string $condition): self
     {
         $this->addJoin(new JoinPart(
-            type: JoinType::Join,
+            type: Join::JOIN,
             table: new TablePart($table, $alias),
             condition: $condition
         ));
@@ -195,7 +195,7 @@ class QueryBuilder implements Part
     public function leftJoin(string $table, string $alias, string $condition): self
     {
         $this->addJoin(new JoinPart(
-            type: JoinType::Left,
+            type: Join::LEFT_JOIN,
             table: new TablePart($table, $alias),
             condition: $condition
         ));
@@ -206,7 +206,7 @@ class QueryBuilder implements Part
     public function rightJoin(string $table, string $alias, string $condition): self
     {
         $this->addJoin(new JoinPart(
-            type: JoinType::Right,
+            type: Join::RIGHT_JOIN,
             table: new TablePart($table, $alias),
             condition: $condition
         ));
@@ -217,7 +217,7 @@ class QueryBuilder implements Part
     public function innerJoin(string $table, string $alias, string $condition): self
     {
         $this->addJoin(new JoinPart(
-            type: JoinType::Inner,
+            type: Join::INNER_JOIN,
             table: new TablePart($table, $alias),
             condition: $condition
         ));
@@ -323,8 +323,8 @@ class QueryBuilder implements Part
             $sql = "{$sql} {$join}";
         }
 
-        if (isset($this->parts[WhereCollectionPart::class]) && $this->parts[WhereCollectionPart::class]->isNotEmpty()) {
-            $wheres = $this->parts[WhereCollectionPart::class]->__toString();
+        if (isset($this->parts[WherePartCollection::class]) && $this->parts[WherePartCollection::class]->isNotEmpty()) {
+            $wheres = $this->parts[WherePartCollection::class]->__toString();
             $sql = "{$sql} {$wheres}";
         }
 
@@ -379,8 +379,8 @@ class QueryBuilder implements Part
 
         $sql = "UPDATE {$table} {$set}";
 
-        if (isset($this->parts[WhereCollectionPart::class]) && $this->parts[WhereCollectionPart::class]->isNotEmpty()) {
-            $wheres = $this->parts[WhereCollectionPart::class]->__toString();
+        if (isset($this->parts[WherePartCollection::class]) && $this->parts[WherePartCollection::class]->isNotEmpty()) {
+            $wheres = $this->parts[WherePartCollection::class]->__toString();
             $sql = "{$sql} {$wheres}";
         }
 
@@ -398,8 +398,8 @@ class QueryBuilder implements Part
 
         $sql = "DELETE FROM {$table}";
 
-        if (isset($this->parts[WhereCollectionPart::class]) && $this->parts[WhereCollectionPart::class]->isNotEmpty()) {
-            $wheres = $this->parts[WhereCollectionPart::class]->__toString();
+        if (isset($this->parts[WherePartCollection::class]) && $this->parts[WherePartCollection::class]->isNotEmpty()) {
+            $wheres = $this->parts[WherePartCollection::class]->__toString();
             $sql = "{$sql} {$wheres}";
         }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-enum WhereType: string
+enum Where: string
 {
-    case And = 'AND';
-    case Or = 'OR';
+    case AND = 'AND';
+    case OR = 'OR';
 }
