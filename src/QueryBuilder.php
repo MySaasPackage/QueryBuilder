@@ -8,18 +8,16 @@ use RuntimeException;
 use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\LimitPart;
 use MySaasPackage\Support\QueryPart\TablePart;
-use MySaasPackage\Support\QueryPart\ColumnPart;
 use MySaasPackage\Support\QueryPart\ValuesPart;
 use MySaasPackage\Support\QueryPart\ColumnsPart;
 use MySaasPackage\Support\QueryPart\GroupByPart;
-use MySaasPackage\Support\QueryPart\OrderByPart;
 use MySaasPackage\Support\QueryPart\HavingByPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
 use MySaasPackage\Support\QueryPart\Join\JoinTrait;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
-use MySaasPackage\Support\QueryPart\OrderByPartCollection;
+use MySaasPackage\Support\QueryPart\OrderBy\OrderByTrait;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
 use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionTrait;
 
@@ -27,6 +25,7 @@ class QueryBuilder implements Part
 {
     use WhereTrait;
     use JoinTrait;
+    use OrderByTrait;
     use CommonTableExpressionTrait;
 
     protected array $parts = [];
@@ -153,21 +152,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    protected function addOrderBy(OrderByPart $orderBy): self
-    {
-        $this->parts[OrderByPartCollection::class] ??= new OrderByPartCollection();
-        $this->parts[OrderByPartCollection::class]->add($orderBy);
-
-        return $this;
-    }
-
-    public function orderBy(string $column, string $direction = 'ASC'): self
-    {
-        $this->addOrderBy(new OrderByPart(new ColumnPart($column), $direction));
-
-        return $this;
-    }
-
     public function groupBy($columns): self
     {
         $this->parts[GroupByPart::class] = new GroupByPart($columns);
@@ -232,9 +216,8 @@ class QueryBuilder implements Part
             $sql = "{$sql} {$this->__toWhere()}";
         }
 
-        if (isset($this->parts[OrderByPartCollection::class]) && $this->parts[OrderByPartCollection::class]->isNotEmpty()) {
-            $orderBy = $this->parts[OrderByPartCollection::class]->__toString();
-            $sql = "{$sql} {$orderBy}";
+        if ($this->orderByPartCollection) {
+            $sql = "{$sql} {$this->__toOrderBy()}";
         }
 
         if (isset($this->parts[GroupByPart::class])) {

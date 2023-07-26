@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\Support\QueryPart\OrderBy;
+
+use MySaasPackage\Support\QueryPart\Part;
 
 class OrderByPartCollection implements Part
 {
