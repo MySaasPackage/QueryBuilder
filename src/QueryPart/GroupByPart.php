@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
-
-class GroupByPart implements Stringable
+class GroupByPart implements Part
 {
     public function __construct(
         public readonly array $columns,

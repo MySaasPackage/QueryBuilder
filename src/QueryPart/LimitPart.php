@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
 use InvalidArgumentException;
 
-class LimitPart implements Stringable
+class LimitPart implements Part
 {
     public function __construct(
         public readonly int $limit

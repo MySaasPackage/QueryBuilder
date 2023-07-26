@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
-
-class ReturningPart implements Stringable
+class ReturningPart implements Part
 {
     public function __construct(
         public readonly array $columns,

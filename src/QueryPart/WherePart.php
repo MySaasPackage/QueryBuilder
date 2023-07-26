@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
-
-class WherePart implements Stringable
+class WherePart implements Part
 {
     public function __construct(
         public readonly string $condition,

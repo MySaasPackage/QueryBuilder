@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
 use MySaasPackage\Support\QueryBuilder;
 
-class CtePart implements Stringable
+class CtePart implements Part
 {
     public function __construct(
         public readonly string $alias,

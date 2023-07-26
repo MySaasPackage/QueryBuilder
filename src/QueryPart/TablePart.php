@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
 use InvalidArgumentException;
 
-class TablePart implements Stringable
+class TablePart implements Part
 {
     public const TABLE_PATTERN = '/^[a-z_]+$/';
 

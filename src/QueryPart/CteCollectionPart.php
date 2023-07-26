@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
-
-class CteCollectionPart implements Stringable
+class CteCollectionPart implements Part
 {
     public function __construct(
         public array $ctes = []

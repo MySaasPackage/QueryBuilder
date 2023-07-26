@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
-
-class JoinPart implements Stringable
+class JoinPart implements Part
 {
     public function __construct(
         public readonly JoinType $type,

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use Stringable;
-
-class OrderByPart implements Stringable
+class OrderByPart implements Part
 {
     public function __construct(
         public readonly array $columns,
