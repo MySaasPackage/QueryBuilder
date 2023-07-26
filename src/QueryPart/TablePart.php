@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 class TablePart implements Part
 {
-    public const TABLE_PATTERN = '/^[a-z_]+$/';
+    public const TABLE_PATTERN = '/^[a-z_.]+$/';
 
     public function __construct(
         public readonly string $table
