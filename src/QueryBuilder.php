@@ -7,13 +7,11 @@ namespace MySaasPackage\Support;
 use RuntimeException;
 use MySaasPackage\Support\QueryPart\Join;
 use MySaasPackage\Support\QueryPart\Part;
-use MySaasPackage\Support\QueryPart\Where;
 use MySaasPackage\Support\QueryPart\CtePart;
-use MySaasPackage\Support\QueryPart\OrderBy;
 use MySaasPackage\Support\QueryPart\JoinPart;
 use MySaasPackage\Support\QueryPart\LimitPart;
 use MySaasPackage\Support\QueryPart\TablePart;
-use MySaasPackage\Support\QueryPart\WherePart;
+use MySaasPackage\Support\QueryPart\ColumnPart;
 use MySaasPackage\Support\QueryPart\ValuesPart;
 use MySaasPackage\Support\QueryPart\ColumnsPart;
 use MySaasPackage\Support\QueryPart\GroupByPart;
@@ -21,15 +19,17 @@ use MySaasPackage\Support\QueryPart\OrderByPart;
 use MySaasPackage\Support\QueryPart\HavingByPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
+use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\CtePartCollection;
 use MySaasPackage\Support\QueryPart\JoinPartCollection;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
-use MySaasPackage\Support\QueryPart\WherePartCollection;
 use MySaasPackage\Support\QueryPart\OrderByPartCollection;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
 
 class QueryBuilder implements Part
 {
+    use WhereTrait;
+
     protected array $parts = [];
 
     public const TYPE = 'type';
@@ -38,13 +38,23 @@ class QueryBuilder implements Part
     public const UPDATE = 'update';
     public const DELETE = 'delete';
 
-    public function __construct()
+    public function __construct(protected DbDriver $drive)
     {
     }
 
-    public static function create(): self
+    public static function create(DbDriver $drive): self
     {
-        return new self();
+        return new self($drive);
+    }
+
+    public static function postgres(): self
+    {
+        return new self(DbDriver::PostgreSQL);
+    }
+
+    public static function mysql(): self
+    {
+        return new self(DbDriver::MySQL);
     }
 
     public function select(array $columns = ['*']): self
@@ -137,35 +147,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    protected function addWhere(WherePart $wherePart): self
-    {
-        $this->parts[WherePartCollection::class] ??= new WherePartCollection();
-        $this->parts[WherePartCollection::class]->add($wherePart);
-
-        return $this;
-    }
-
-    public function where(string $condition): self
-    {
-        $this->addWhere(new WherePart($condition));
-
-        return $this;
-    }
-
-    public function andWhere(string $condition): self
-    {
-        $this->addWhere(new WherePart($condition, Where::AND));
-
-        return $this;
-    }
-
-    public function orWhere(string $condition): self
-    {
-        $this->addWhere(new WherePart($condition, Where::Or));
-
-        return $this;
-    }
-
     public function returning(array $columns = []): self
     {
         $this->parts[ReturningPart::class] = new ReturningPart($columns);
@@ -233,15 +214,9 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function orderBy(array $columns, OrderBy|string $direction = null): self
+    public function orderBy(string $column, string $direction = 'ASC'): self
     {
-        $direction ??= OrderBy::ASC;
-
-        if (is_string($direction)) {
-            $direction = OrderBy::from($direction);
-        }
-
-        $this->addOrderBy(new OrderByPart($columns, $direction));
+        $this->addOrderBy(new OrderByPart(new ColumnPart($column), $direction));
 
         return $this;
     }
@@ -253,9 +228,9 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function limit(int $limit): self
+    public function limit(int $limit, int $offset = null): self
     {
-        $this->parts[LimitPart::class] = new LimitPart($limit);
+        $this->parts[LimitPart::class] = new LimitPart($this->drive, $limit, $offset);
 
         return $this;
     }
@@ -323,9 +298,8 @@ class QueryBuilder implements Part
             $sql = "{$sql} {$join}";
         }
 
-        if (isset($this->parts[WherePartCollection::class]) && $this->parts[WherePartCollection::class]->isNotEmpty()) {
-            $wheres = $this->parts[WherePartCollection::class]->__toString();
-            $sql = "{$sql} {$wheres}";
+        if ($this->wherePartsCollection) {
+            $sql = "{$sql} {$this->wherePartsCollection->__toString()}";
         }
 
         if (isset($this->parts[OrderByPartCollection::class]) && $this->parts[OrderByPartCollection::class]->isNotEmpty()) {
