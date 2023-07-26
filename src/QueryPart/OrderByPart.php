@@ -8,7 +8,7 @@ class OrderByPart implements Part
 {
     public function __construct(
         public readonly array $columns,
-        public readonly OrderByType|null $orderType = null,
+        public readonly OrderBy|null $orderType = null,
     ) {
     }
 

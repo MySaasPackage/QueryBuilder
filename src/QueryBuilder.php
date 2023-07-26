@@ -7,6 +7,7 @@ namespace MySaasPackage\Support;
 use RuntimeException;
 use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\CtePart;
+use MySaasPackage\Support\QueryPart\OrderBy;
 use MySaasPackage\Support\QueryPart\JoinPart;
 use MySaasPackage\Support\QueryPart\JoinType;
 use MySaasPackage\Support\QueryPart\LimitPart;
@@ -17,7 +18,6 @@ use MySaasPackage\Support\QueryPart\ValuesPart;
 use MySaasPackage\Support\QueryPart\ColumnsPart;
 use MySaasPackage\Support\QueryPart\GroupByPart;
 use MySaasPackage\Support\QueryPart\OrderByPart;
-use MySaasPackage\Support\QueryPart\OrderByType;
 use MySaasPackage\Support\QueryPart\HavingByPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
@@ -181,44 +181,44 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function join(string $table, string $condition): self
+    public function join(string $table, string $alias, string $condition): self
     {
         $this->addJoin(new JoinPart(
             type: JoinType::Join,
-            table: new TablePart($table),
+            table: new TablePart($table, $alias),
             condition: $condition
         ));
 
         return $this;
     }
 
-    public function leftJoin(string $table, string $condition): self
+    public function leftJoin(string $table, string $alias, string $condition): self
     {
         $this->addJoin(new JoinPart(
             type: JoinType::Left,
-            table: new TablePart($table),
+            table: new TablePart($table, $alias),
             condition: $condition
         ));
 
         return $this;
     }
 
-    public function rightJoin(string $table, string $condition): self
+    public function rightJoin(string $table, string $alias, string $condition): self
     {
         $this->addJoin(new JoinPart(
             type: JoinType::Right,
-            table: new TablePart($table),
+            table: new TablePart($table, $alias),
             condition: $condition
         ));
 
         return $this;
     }
 
-    public function innerJoin(string $table, string $condition): self
+    public function innerJoin(string $table, string $alias, string $condition): self
     {
         $this->addJoin(new JoinPart(
             type: JoinType::Inner,
-            table: new TablePart($table),
+            table: new TablePart($table, $alias),
             condition: $condition
         ));
 
@@ -233,12 +233,12 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function orderBy(array $columns, string $direction = null): self
+    public function orderBy(array $columns, OrderBy|string $direction = null): self
     {
-        $direction ??= OrderByType::Asc;
+        $direction ??= OrderBy::ASC;
 
         if (is_string($direction)) {
-            $direction = OrderByType::from($direction);
+            $direction = OrderBy::from($direction);
         }
 
         $this->addOrderBy(new OrderByPart($columns, $direction));

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-enum OrderByType: string
+enum OrderBy: string
 {
-    case Asc = 'ASC';
-    case Desc = 'DESC';
+    case ASC = 'ASC';
+    case DESC = 'DESC';
 }

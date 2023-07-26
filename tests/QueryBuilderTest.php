@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MySaasPackage\Support;
 
 use PHPUnit\Framework\TestCase;
+use MySaasPackage\Support\QueryPart\OrderBy;
 
 final class QueryBuilderTest extends TestCase
 {
@@ -15,20 +16,21 @@ final class QueryBuilderTest extends TestCase
         $query = QueryBuilder::create()
             ->with('user', $userCTE)
             ->with('profile', $profileCTE)
-            ->select(['id AS user__id', 'name', 'email'])
-            ->from('schema.users')
-            ->join('user_profiles', 'user_profiles.user_id = users.id')
-            ->where('name = :name')
-            ->groupBy(['id', 'name', 'email'])
-            ->orderBy(['id', 'name', 'email'])
-            ->orderBy(['id', 'name', 'email'], 'DESC')
-            ->having('COUNT(*) > 1')
+            ->select([
+                'u.id AS user__id',
+                'u.name AS user__name',
+                'u.email AS user__email',
+            ])
+            ->from('schema.users', 'u')
+            ->join('user_profiles', 'up', 'up.user_id = u.id')
+            ->where('up.name = :name')
+            ->orderBy(['u.id'], OrderBy::DESC)
             ->limit(10)
             ->setParameter('name', 'John');
 
         $this->assertEqualsIgnoringCase('SELECT id as user__id, name, email FROM users', $userCTE->__toString());
         $this->assertEqualsIgnoringCase('SELECT id as user__id, name, email FROM profile RETURNING id as profile__id, user_id, address', $profileCTE->__toString());
-        $this->assertEqualsIgnoringCase('WITH user AS (SELECT id as user__id, name, email FROM users), profile AS (SELECT id as user__id, name, email FROM profile RETURNING id as profile__id, user_id, address) SELECT id as user__id, name, email FROM schema.users JOIN user_profiles ON user_profiles.user_id = users.id WHERE name = \'John\' ORDER BY id, name, email ASC id, name, email DESC GROUP BY id, name, email HAVING COUNT(*) > 1 LIMIT 10', $query->__toString());
+        $this->assertEqualsIgnoringCase('WITH user AS (SELECT id AS user__id, name, email FROM users), profile AS (SELECT id AS user__id, name, email FROM profile RETURNING id AS profile__id, user_id, address) SELECT u.id AS user__id, u.name AS user__name, u.email AS user__email FROM schema.users AS u JOIN user_profiles AS up ON up.user_id = u.id WHERE up.name = \'John\' ORDER BY u.id DESC LIMIT 10', $query->__toString());
     }
 
     public function testInsertSuccessful(): void
@@ -51,11 +53,14 @@ final class QueryBuilderTest extends TestCase
     {
         $query = QueryBuilder::create()
             ->update('users')
-            ->set(['name' => ':name', 'email' => ':email'])
-            ->where('id = :id')
-            ->setParameter('name', 'John')
-            ->setParameter('email', 'john@gmail.com')
-            ->setParameter('id', 1);
+            ->set([
+                'name' => '?',
+                'email' => '?',
+            ])
+            ->where('id = ?')
+            ->setParameter(0, 'John')
+            ->setParameter(1, 'john@gmail.com')
+            ->setParameter(2, 1);
 
         $this->assertEqualsIgnoringCase('UPDATE users SET name = \'John\', email = \'john@gmail.com\' WHERE id = 1', $query->__toString());
     }
