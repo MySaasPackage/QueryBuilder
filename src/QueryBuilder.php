@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace MySaasPackage\Support;
 
 use RuntimeException;
-use MySaasPackage\Support\QueryPart\Join;
 use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\CtePart;
-use MySaasPackage\Support\QueryPart\JoinPart;
 use MySaasPackage\Support\QueryPart\LimitPart;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\ColumnPart;
@@ -19,9 +17,9 @@ use MySaasPackage\Support\QueryPart\OrderByPart;
 use MySaasPackage\Support\QueryPart\HavingByPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
+use MySaasPackage\Support\QueryPart\Join\JoinTrait;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\CtePartCollection;
-use MySaasPackage\Support\QueryPart\JoinPartCollection;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
 use MySaasPackage\Support\QueryPart\OrderByPartCollection;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
@@ -29,6 +27,7 @@ use MySaasPackage\Support\QueryPart\ParameterPartCollection;
 class QueryBuilder implements Part
 {
     use WhereTrait;
+    use JoinTrait;
 
     protected array $parts = [];
 
@@ -154,58 +153,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    protected function addJoin(JoinPart $join): self
-    {
-        $this->parts[JoinPartCollection::class] ??= new JoinPartCollection();
-        $this->parts[JoinPartCollection::class]->add($join);
-
-        return $this;
-    }
-
-    public function join(string $table, string $alias, string $condition): self
-    {
-        $this->addJoin(new JoinPart(
-            type: Join::JOIN,
-            table: new TablePart($table, $alias),
-            condition: $condition
-        ));
-
-        return $this;
-    }
-
-    public function leftJoin(string $table, string $alias, string $condition): self
-    {
-        $this->addJoin(new JoinPart(
-            type: Join::LEFT_JOIN,
-            table: new TablePart($table, $alias),
-            condition: $condition
-        ));
-
-        return $this;
-    }
-
-    public function rightJoin(string $table, string $alias, string $condition): self
-    {
-        $this->addJoin(new JoinPart(
-            type: Join::RIGHT_JOIN,
-            table: new TablePart($table, $alias),
-            condition: $condition
-        ));
-
-        return $this;
-    }
-
-    public function innerJoin(string $table, string $alias, string $condition): self
-    {
-        $this->addJoin(new JoinPart(
-            type: Join::INNER_JOIN,
-            table: new TablePart($table, $alias),
-            condition: $condition
-        ));
-
-        return $this;
-    }
-
     protected function addOrderBy(OrderByPart $orderBy): self
     {
         $this->parts[OrderByPartCollection::class] ??= new OrderByPartCollection();
@@ -293,13 +240,12 @@ class QueryBuilder implements Part
             $sql = "{$ctes} {$sql}";
         }
 
-        if (isset($this->parts[JoinPartCollection::class]) && $this->parts[JoinPartCollection::class]->isNotEmpty()) {
-            $join = $this->parts[JoinPartCollection::class]->__toString();
-            $sql = "{$sql} {$join}";
+        if ($this->joinPartCollection) {
+            $sql = "{$sql} {$this->__toJoin()}";
         }
 
         if ($this->wherePartsCollection) {
-            $sql = "{$sql} {$this->wherePartsCollection->__toString()}";
+            $sql = "{$sql} {$this->__toWhere()}";
         }
 
         if (isset($this->parts[OrderByPartCollection::class]) && $this->parts[OrderByPartCollection::class]->isNotEmpty()) {
