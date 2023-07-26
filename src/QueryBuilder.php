@@ -108,16 +108,16 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function table(string $table): self
+    public function table(string $table, string $alias = null): self
     {
-        $this->parts[TablePart::class] = new TablePart($table);
+        $this->parts[TablePart::class] = new TablePart($table, $alias);
 
         return $this;
     }
 
-    public function from(string $table): self
+    public function from(string $table, string $alias = null): self
     {
-        $this->parts[TablePart::class] = new TablePart($table);
+        $this->parts[TablePart::class] = new TablePart($table, $alias);
 
         return $this;
     }
