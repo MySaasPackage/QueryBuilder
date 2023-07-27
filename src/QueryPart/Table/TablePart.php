@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\Table;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\StringablePart;
 
 class TablePart implements Stringable
 {
     public function __construct(
-        public readonly StringablePart|string $table,
+        public readonly Stringable|string $table,
         public readonly string|null $alias = null
     ) {
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Where;
 
-use MySaasPackage\Support\QueryPart\StringablePart;
+use Stringable;
 
 trait WhereModule
 {
@@ -18,21 +18,21 @@ trait WhereModule
         return $this;
     }
 
-    public function where(StringablePart|string $condition): static
+    public function where(Stringable|string $condition): static
     {
         $this->addWhere(new WherePart($condition));
 
         return $this;
     }
 
-    public function andWhere(StringablePart|string $condition): static
+    public function andWhere(Stringable|string $condition): static
     {
         $this->addWhere(new WherePart($condition, Where::AND));
 
         return $this;
     }
 
-    public function orWhere(StringablePart|string $condition): static
+    public function orWhere(Stringable|string $condition): static
     {
         $this->addWhere(new WherePart($condition, Where::OR));
 

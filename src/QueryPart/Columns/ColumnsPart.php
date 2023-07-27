@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\Columns;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\StringablePart;
 
 class ColumnsPart implements Stringable
 {
     public array $columns = [];
 
-    public function add(StringablePart $column): self
+    public function add(Stringable|string $column): self
     {
         $this->columns[] = $column;
 

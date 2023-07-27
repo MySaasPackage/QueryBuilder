@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\HavingBy;
 
-use MySaasPackage\Support\QueryPart\StringablePart;
+use Stringable;
 
 trait HavingByModule
 {
     protected HavingByPart|null $havingByPart = null;
 
-    public function having(StringablePart|string $condition): static
+    public function having(Stringable|string $condition): static
     {
         $this->havingByPart = new HavingByPart($condition);
 

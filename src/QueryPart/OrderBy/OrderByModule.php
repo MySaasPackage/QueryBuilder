@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\OrderBy;
 
-use MySaasPackage\Support\QueryPart\StringablePart;
+use Stringable;
 
 trait OrderByModule
 {
@@ -18,14 +18,14 @@ trait OrderByModule
         return $this;
     }
 
-    public function orderBy(StringablePart|string $column, string $direction = null): static
+    public function orderBy(Stringable|string $column, string $direction = null): static
     {
         $this->addOrderByPartToCollection(new OrderByPart($column, $direction));
 
         return $this;
     }
 
-    public function addOrderBy(StringablePart|string $column, string $direction = null): static
+    public function addOrderBy(Stringable|string $column, string $direction = null): static
     {
         $direction ??= 'ASC';
 

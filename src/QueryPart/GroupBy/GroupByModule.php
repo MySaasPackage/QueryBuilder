@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\GroupBy;
 
-use MySaasPackage\Support\QueryPart\StringablePart;
+use Stringable;
 
 trait GroupByModule
 {
     protected GroupByPart|null $groupByPart = null;
 
-    protected function addGroupByPart(StringablePart $groupBy): static
+    protected function addGroupByPart(Stringable|string $groupBy): static
     {
         $this->groupByPart ??= new GroupByPart();
         $this->groupByPart->add($groupBy);
@@ -18,16 +18,16 @@ trait GroupByModule
         return $this;
     }
 
-    public function groupBy(string $column): static
+    public function groupBy(Stringable|string $column): static
     {
-        $this->addGroupByPart(new StringablePart($column));
+        $this->addGroupByPart($column);
 
         return $this;
     }
 
-    public function addGroupBy(string $column): static
+    public function addGroupBy(Stringable|string $column): static
     {
-        $this->addGroupByPart(new StringablePart($column));
+        $this->addGroupByPart($column);
 
         return $this;
     }

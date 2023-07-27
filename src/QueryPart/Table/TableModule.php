@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Table;
 
-use MySaasPackage\Support\QueryPart\StringablePart;
+use Stringable;
 
 trait TableModule
 {
     protected TablePart|null $tablePart = null;
 
-    public function table(StringablePart|string $table, string $alias = null): static
+    public function table(Stringable|string $table, string $alias = null): static
     {
         $this->tablePart = new TablePart($table, $alias);
 
         return $this;
     }
 
-    public function from(StringablePart|string $table, string $alias = null): static
+    public function from(Stringable|string $table, string $alias = null): static
     {
         $this->tablePart = new TablePart($table, $alias);
 

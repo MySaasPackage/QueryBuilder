@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\OrderBy;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\StringablePart;
 
 class OrderByPart implements Stringable
 {
     public function __construct(
-        public readonly StringablePart|string $column,
+        public readonly Stringable|string $column,
         public string|null $direction = null,
     ) {
     }

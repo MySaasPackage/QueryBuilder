@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\GroupBy;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\StringablePart;
 
 class GroupByPart implements Stringable
 {
     public array $columns;
 
-    public function add(StringablePart $column): static
+    public function add(Stringable|string $column): static
     {
         $this->columns[] = $column;
 
