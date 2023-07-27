@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\Columns;
 
 use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\StringablePart;
 
 class ColumnsPart implements Part
 {
-    public function __construct(
-        public readonly array $columns,
-    ) {
+    public array $columns = [];
+
+    public function add(StringablePart $column): self
+    {
+        $this->columns[] = $column;
+
+        return $this;
     }
 
     public function __toString(): string

@@ -6,7 +6,7 @@ namespace MySaasPackage\Support\QueryPart\Join;
 
 use MySaasPackage\Support\QueryPart\TablePart;
 
-trait JoinTrait
+trait JoinModule
 {
     protected JoinPartCollection|null $joinPartCollection = null;
 

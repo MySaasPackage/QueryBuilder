@@ -13,7 +13,7 @@ use MySaasPackage\Support\QueryPart\GroupByPart;
 use MySaasPackage\Support\QueryPart\HavingByPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
-use MySaasPackage\Support\QueryPart\Join\JoinTrait;
+use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsPart;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
@@ -25,7 +25,7 @@ use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionT
 class QueryBuilder implements Part
 {
     use WhereTrait;
-    use JoinTrait;
+    use JoinModule;
     use OrderByTrait;
     use ColumnsModule;
     use CommonTableExpressionTrait;
