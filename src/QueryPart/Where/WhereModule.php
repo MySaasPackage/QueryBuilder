@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Where;
 
-trait WhereTrait
+trait WhereModule
 {
     protected WherePartCollection|null $wherePartsCollection = null;
 
@@ -39,6 +39,6 @@ trait WhereTrait
 
     public function __toWhere(): string
     {
-        return $this->wherePartsCollection->__toString();
+        return $this->wherePartsCollection?->__toString() ?? '';
     }
 }

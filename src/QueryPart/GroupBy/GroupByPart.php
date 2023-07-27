@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\GroupBy;
 
 use MySaasPackage\Support\QueryPart\QueryPart;
-use MySaasPackage\Support\QueryPart\HavingBy\StringablePart;
+use MySaasPackage\Support\QueryPart\StringablePart;
 
-class GroupByPartCollection implements QueryPart
+class GroupByPart implements QueryPart
 {
     public readonly array $columns;
 
@@ -24,6 +24,6 @@ class GroupByPartCollection implements QueryPart
             return '';
         }
 
-        return 'GROUP BY ' . implode(', ', array_map(fn ($column) => strtolower(trim($column)), $this->columns));
+        return 'GROUP BY ' . implode(', ', array_map(fn ($column) => strval($column), $this->columns));
     }
 }

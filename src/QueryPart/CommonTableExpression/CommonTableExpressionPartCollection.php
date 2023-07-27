@@ -8,29 +8,26 @@ use MySaasPackage\Support\QueryPart\QueryPart;
 
 class CommonTableExpressionPartCollection implements QueryPart
 {
-    public function __construct(
-        public array $ctes = []
-    ) {
-    }
+    protected array $commonTableExpressions = [];
 
-    public function add(CommonTableExpressionPart $cte): self
+    public function add(CommonTableExpressionPart $commonTableExpression): self
     {
-        $this->ctes[] = $cte;
+        $this->commonTableExpressions[] = $commonTableExpression;
 
         return $this;
     }
 
     public function isNotEmpty(): bool
     {
-        return 0 !== count($this->ctes);
+        return 0 !== count($this->commonTableExpressions);
     }
 
     public function __toString()
     {
-        if (0 === count($this->ctes)) {
+        if (0 === count($this->commonTableExpressions)) {
             return '';
         }
 
-        return 'WITH ' . implode(', ', $this->ctes);
+        return 'WITH ' . implode(', ', $this->commonTableExpressions);
     }
 }

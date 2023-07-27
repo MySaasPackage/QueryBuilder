@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart;
 
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
-use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Limit\LimitModule;
 use MySaasPackage\Support\QueryPart\Table\TableModule;
+use MySaasPackage\Support\QueryPart\Where\WhereModule;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
@@ -18,7 +18,7 @@ use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionM
 
 class SelectQueryBuilder implements QueryBuilder
 {
-    use WhereTrait;
+    use WhereModule;
     use JoinModule;
     use OrderByModule;
     use ColumnsModule;
@@ -55,7 +55,7 @@ class SelectQueryBuilder implements QueryBuilder
             $sql = "{$sql} {$this->__toOrderBy()}";
         }
 
-        if ($this->groupByPartCollection) {
+        if ($this->groupByPart) {
             $sql = "{$sql} {$this->__toGroupBySql()}";
         }
 

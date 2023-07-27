@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\Join;
 
 use MySaasPackage\Support\QueryPart\QueryPart;
-use MySaasPackage\Support\QueryPart\TablePart;
+use MySaasPackage\Support\QueryPart\Table\TablePart;
 
 class JoinPart implements QueryPart
 {

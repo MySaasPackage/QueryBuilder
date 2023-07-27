@@ -25,6 +25,7 @@ return (new PhpCsFixer\Config())
             'import_classes' => true,
         ],
         'ordered_imports' => ['sort_algorithm' => 'length', 'imports_order' => ['const', 'class', 'function']],
+        'single_blank_line_at_eof' => true,
     ])
     ->setFinder($finder)
     ->setUsingCache(true)

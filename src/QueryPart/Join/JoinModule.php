@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Join;
 
-use MySaasPackage\Support\QueryPart\TablePart;
+use MySaasPackage\Support\QueryPart\StringablePart;
+use MySaasPackage\Support\QueryPart\Table\TablePart;
 
 trait JoinModule
 {
@@ -22,7 +23,7 @@ trait JoinModule
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::JOIN,
-            table: new TablePart($table, $alias),
+            table: new TablePart(new StringablePart($table), $alias),
             condition: $condition
         ));
 
@@ -33,7 +34,7 @@ trait JoinModule
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::LEFT_JOIN,
-            table: new TablePart($table, $alias),
+            table: new TablePart(new StringablePart($table), $alias),
             condition: $condition
         ));
 
@@ -44,7 +45,7 @@ trait JoinModule
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::RIGHT_JOIN,
-            table: new TablePart($table, $alias),
+            table: new TablePart(new StringablePart($table), $alias),
             condition: $condition
         ));
 
@@ -55,7 +56,7 @@ trait JoinModule
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::INNER_JOIN,
-            table: new TablePart($table, $alias),
+            table: new TablePart(new StringablePart($table), $alias),
             condition: $condition
         ));
 

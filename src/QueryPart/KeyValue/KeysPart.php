@@ -15,6 +15,6 @@ class KeysPart implements QueryPart
 
     public function __toString(): string
     {
-        return '(' . implode(', ', array_map(fn ($column) => strtolower(trim($column)), $this->columns)) . ')';
+        return '(' . implode(', ', array_map(fn ($column) => strval($column), $this->columns)) . ')';
     }
 }

@@ -15,6 +15,6 @@ class ValuesPart implements QueryPart
 
     public function __toString(): string
     {
-        return 'VALUES (' . implode(', ', array_map(fn ($column) => strtolower(trim($column)), $this->columns)) . ')';
+        return 'VALUES (' . implode(', ', array_map(fn ($column) => strval($column), $this->columns)) . ')';
     }
 }
