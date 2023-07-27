@@ -109,4 +109,14 @@ final class PostgreSQLQueryBuilderTest extends TestCase
 
         $this->assertEquals('UPDATE management.subscriptions SET uuid = ?, first_name = ?, last_name = ?, email = ?, phone = ?', $query->__toString());
     }
+
+    public function testDeleteSucceessful(): void
+    {
+        $query = QueryBuilder::postgres()
+            ->delete('management.subscriptions')
+            ->where('uuid = ?')
+            ->setParameter(0, '69e5e669-910a-4e8c-9529-7142b1ae0655');
+
+        $this->assertEquals('DELETE FROM management.subscriptions WHERE uuid = \'69e5e669-910a-4e8c-9529-7142b1ae0655\'', $query->__toString());
+    }
 }
