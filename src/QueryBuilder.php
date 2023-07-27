@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support;
 
+use MySaasPackage\Support\QueryPart\DbDriver;
 use MySaasPackage\Support\QueryPart\DeleteQueryBuilder;
 use MySaasPackage\Support\QueryPart\InsertQueryBuilder;
 use MySaasPackage\Support\QueryPart\SelectQueryBuilder;

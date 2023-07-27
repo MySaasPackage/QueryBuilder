@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support;
+namespace MySaasPackage\Support\QueryPart;
 
 enum DbDriver: string
 {

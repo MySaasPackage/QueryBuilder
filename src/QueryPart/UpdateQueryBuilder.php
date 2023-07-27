@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-use MySaasPackage\Support\DbDriver;
 use MySaasPackage\Support\QueryPart\Set\SetModule;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;

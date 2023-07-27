@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\Limit;
 
 use InvalidArgumentException;
-use MySaasPackage\Support\DbDriver;
+use MySaasPackage\Support\QueryPart\DbDriver;
 use MySaasPackage\Support\QueryPart\QueryPart;
 use MySaasPackage\Support\QueryPart\DrivablePart;
 
