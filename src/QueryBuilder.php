@@ -31,10 +31,7 @@ class QueryBuilder
 
     public function with(string $alias, QueryBuilderContract $query): self
     {
-        $this->commonTableExpressionPartCollection[] = [
-            'alias' => $alias,
-            'query' => $query,
-        ];
+        $this->commonTableExpressionPartCollection[] = [$alias, $query];
 
         return $this;
     }
@@ -44,8 +41,8 @@ class QueryBuilder
         $queryBuilder = new SelectQueryBuilder($this->driver);
         $queryBuilder->columns($columns);
 
-        foreach ($this->commonTableExpressionPartCollection as $commonTableExpression) {
-            $queryBuilder->with($commonTableExpression['alias'], $commonTableExpression['query']);
+        foreach ($this->commonTableExpressionPartCollection as [$alias, $expression]) {
+            $queryBuilder->with($alias, $expression);
         }
 
         return $queryBuilder;
