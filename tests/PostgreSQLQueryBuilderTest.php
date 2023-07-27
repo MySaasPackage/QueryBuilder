@@ -28,7 +28,11 @@ final class PostgreSQLQueryBuilderTest extends TestCase
 
     public function testSelectWithWhereInSubSelect(): void
     {
-        $subQuery = QueryBuilder::postgres()->select(['order_id'])->from('order_items')->where('items_name = :name')->setParameter('name', 'Widget');
+        $subQuery = QueryBuilder::postgres()
+            ->select(['order_id'])
+            ->from('order_items')
+            ->where('items_name = :name')
+            ->setParameter('name', 'Widget');
 
         $query = QueryBuilder::postgres()
             ->select(['*'])
@@ -41,7 +45,9 @@ final class PostgreSQLQueryBuilderTest extends TestCase
 
     public function testSelectWithSubSelect(): void
     {
-        $avgRateQuery = QueryBuilder::postgres()->select(['AVG(rate)'])->from('film');
+        $avgRateQuery = QueryBuilder::postgres()
+            ->select(['AVG(rate)'])
+            ->from('film');
 
         $query = QueryBuilder::postgres()
             ->select(['id', 'title', 'description', 'rate'])
