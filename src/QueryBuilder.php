@@ -11,7 +11,9 @@ use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Limit\LimitModule;
 use MySaasPackage\Support\QueryPart\Table\TableModule;
+use MySaasPackage\Support\QueryPart\InsertQueryBuilder;
 use MySaasPackage\Support\QueryPart\SelectQueryBuilder;
+use MySaasPackage\Support\QueryPart\UpdateQueryBuilder;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
@@ -72,27 +74,20 @@ class QueryBuilder implements Part
         return $selectQueryBuilder;
     }
 
-    public function insert(string $table): self
+    public function insert(string $table): InsertQueryBuilder
     {
-        $this->parts[self::TYPE] = self::INSERT;
-        $this->table($table);
+        $insertQueryBuilder = new InsertQueryBuilder($this->driver);
+        $insertQueryBuilder->into($table);
 
-        return $this;
+        return $insertQueryBuilder;
     }
 
-    public function into(string $table): self
+    public function update(string $table): UpdateQueryBuilder
     {
-        $this->table($table);
+        $insertQueryBuilder = new UpdateQueryBuilder($this->driver);
+        $insertQueryBuilder->table($table);
 
-        return $this;
-    }
-
-    public function update(string $table): self
-    {
-        $this->parts[self::TYPE] = self::UPDATE;
-        $this->table($table);
-
-        return $this;
+        return $insertQueryBuilder;
     }
 
     public function delete(): self
@@ -100,71 +95,6 @@ class QueryBuilder implements Part
         $this->parts[self::TYPE] = self::DELETE;
 
         return $this;
-    }
-
-    public function __toSelect(): string
-    {
-        $sql = "SELECT {$this->__toColumns()} FROM {$this->__toTable()}";
-
-        if ($this->commonTableExpressionPartCollection) {
-            $sql = "{$this->__toCommonTableExpression()} {$sql}";
-        }
-
-        if ($this->joinPartCollection) {
-            $sql = "{$sql} {$this->__toJoin()}";
-        }
-
-        if ($this->wherePartsCollection) {
-            $sql = "{$sql} {$this->__toWhere()}";
-        }
-
-        if ($this->orderByPartCollection) {
-            $sql = "{$sql} {$this->__toOrderBy()}";
-        }
-
-        if ($this->groupByPartCollection) {
-            $sql = "{$sql} {$this->__toGroupBySql()}";
-        }
-
-        if ($this->havingByPart) {
-            $sql = "{$sql} {$this->__toHavingBy()}";
-        }
-
-        if ($this->limitPart) {
-            $sql = "{$sql} {$this->__toLimit()}";
-        }
-
-        if ($this->returningPart) {
-            $sql = "{$sql} {$this->__toReturning()}";
-        }
-
-        return $sql;
-    }
-
-    public function __toInsert(): string
-    {
-        $sql = "INSERT INTO {$this->__toTable()} ({$this->__toKeys()}) ({$this->__toValues()})";
-
-        if ($this->returningPart) {
-            $sql = "{$sql} {$this->__toReturning()}";
-        }
-
-        return $sql;
-    }
-
-    public function __toUpdate(): string
-    {
-        $sql = "UPDATE {$this->__toTable()} {$this->__toSet()}";
-
-        if ($this->wherePartsCollection) {
-            $sql = "{$sql} {$this->__toWhere()}";
-        }
-
-        if ($this->returningPart) {
-            $sql = "{$sql} {$this->__toReturning()}";
-        }
-
-        return $sql;
     }
 
     public function __toDelete(): string
@@ -180,18 +110,6 @@ class QueryBuilder implements Part
 
     public function __toString(): string
     {
-        if (self::SELECT === $this->parts[self::TYPE]) {
-            return $this->bindParameterParts($this->__toSelect());
-        }
-
-        if (self::INSERT === $this->parts[self::TYPE]) {
-            return $this->bindParameterParts($this->__toInsert());
-        }
-
-        if (self::UPDATE === $this->parts[self::TYPE]) {
-            return $this->bindParameterParts($this->__toUpdate());
-        }
-
         if (self::DELETE === $this->parts[self::TYPE]) {
             return $this->bindParameterParts($this->__toDelete());
         }

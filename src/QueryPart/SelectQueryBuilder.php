@@ -36,13 +36,6 @@ class SelectQueryBuilder implements Part
     ) {
     }
 
-    public function select(array $columns = ['*']): self
-    {
-        $this->columns($columns);
-
-        return $this;
-    }
-
     public function __toString(): string
     {
         $sql = "SELECT {$this->__toColumns()} FROM {$this->__toTable()}";
