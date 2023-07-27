@@ -10,7 +10,7 @@ trait HavingByModule
 {
     protected HavingByPart|null $havingByPart = null;
 
-    public function having(string $condition): self
+    public function having(string $condition): static
     {
         $this->havingByPart = new HavingByPart(new StringablePart($condition));
 

@@ -11,7 +11,7 @@ class GroupByPart implements QueryPart
 {
     public readonly array $columns;
 
-    public function add(StringablePart $column): self
+    public function add(StringablePart $column): static
     {
         $this->columns[] = $column;
 

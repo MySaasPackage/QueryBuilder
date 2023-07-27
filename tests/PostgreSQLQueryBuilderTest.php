@@ -28,9 +28,7 @@ final class PostgreSQLQueryBuilderTest extends TestCase
 
     public function testSelectWithSubSelect(): void
     {
-        $avgRateQuery = QueryBuilder::postgres()
-            ->select(['AVG(rate)'])
-            ->from('film');
+        $avgRateQuery = QueryBuilder::postgres()->select(['AVG(rate)'])->from('film');
 
         $query = QueryBuilder::postgres()
             ->select(['id', 'title', 'description', 'rate'])

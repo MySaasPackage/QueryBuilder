@@ -9,7 +9,7 @@ trait KeyValueModule
     protected ValuesPart|null $valuesPart = null;
     protected KeysPart|null $keysPart = null;
 
-    public function values(array $values = []): self
+    public function values(array $values = []): static
     {
         $this->keysPart = new KeysPart(array_keys($values));
         $this->valuesPart = new ValuesPart(array_values($values));

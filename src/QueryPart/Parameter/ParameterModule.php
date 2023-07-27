@@ -16,7 +16,7 @@ trait ParameterModule
         return $this;
     }
 
-    public function setParameter(string|int $key, mixed $value): self
+    public function setParameter(string|int $key, mixed $value): static
     {
         $this->addParam(new ParameterPart($key, $value));
 

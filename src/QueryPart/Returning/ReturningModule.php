@@ -8,7 +8,7 @@ trait ReturningModule
 {
     protected ReturningPart|null $returningPart = null;
 
-    public function returning(array $columns = []): self
+    public function returning(array $columns = []): static
     {
         $this->returningPart = new ReturningPart($columns);
 

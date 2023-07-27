@@ -10,7 +10,7 @@ trait GroupByModule
 {
     protected GroupByPart|null $groupByPart = null;
 
-    protected function addGroupByPart(StringablePart $groupBy): self
+    protected function addGroupByPart(StringablePart $groupBy): static
     {
         $this->groupByPart ??= new GroupByPart();
         $this->groupByPart->add($groupBy);
@@ -18,14 +18,14 @@ trait GroupByModule
         return $this;
     }
 
-    public function groupBy(string $column): self
+    public function groupBy(string $column): static
     {
         $this->addGroupByPart(new StringablePart($column));
 
         return $this;
     }
 
-    public function addGroupBy(string $column): self
+    public function addGroupBy(string $column): static
     {
         $this->addGroupByPart(new StringablePart($column));
 

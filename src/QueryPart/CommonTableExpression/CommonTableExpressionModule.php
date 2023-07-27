@@ -10,7 +10,7 @@ trait CommonTableExpressionModule
 {
     protected CommonTableExpressionPartCollection|null $commonTableExpressionPartCollection = null;
 
-    protected function addCommonTableExpressionToCollection(CommonTableExpressionPart $commonTableExpression): self
+    protected function addCommonTableExpressionToCollection(CommonTableExpressionPart $commonTableExpression): static
     {
         $this->commonTableExpressionPartCollection ??= new CommonTableExpressionPartCollection();
         $this->commonTableExpressionPartCollection->add($commonTableExpression);
@@ -18,7 +18,7 @@ trait CommonTableExpressionModule
         return $this;
     }
 
-    public function with(string $alias, QueryBuilder $query): self
+    public function with(string $alias, QueryBuilder $query): static
     {
         $this->addCommonTableExpressionToCollection(new CommonTableExpressionPart($alias, $query));
 

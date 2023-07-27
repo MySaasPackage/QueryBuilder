@@ -11,7 +11,7 @@ trait JoinModule
 {
     protected JoinPartCollection|null $joinPartCollection = null;
 
-    protected function addJoinPartToCollection(JoinPart $join): self
+    protected function addJoinPartToCollection(JoinPart $join): static
     {
         $this->joinPartCollection ??= new JoinPartCollection();
         $this->joinPartCollection->add($join);
@@ -19,7 +19,7 @@ trait JoinModule
         return $this;
     }
 
-    public function join(string $table, string $alias, string $condition): self
+    public function join(string $table, string $alias, string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::JOIN,
@@ -30,7 +30,7 @@ trait JoinModule
         return $this;
     }
 
-    public function leftJoin(string $table, string $alias, string $condition): self
+    public function leftJoin(string $table, string $alias, string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::LEFT_JOIN,
@@ -41,7 +41,7 @@ trait JoinModule
         return $this;
     }
 
-    public function rightJoin(string $table, string $alias, string $condition): self
+    public function rightJoin(string $table, string $alias, string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::RIGHT_JOIN,
@@ -52,7 +52,7 @@ trait JoinModule
         return $this;
     }
 
-    public function innerJoin(string $table, string $alias, string $condition): self
+    public function innerJoin(string $table, string $alias, string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::INNER_JOIN,

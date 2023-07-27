@@ -10,7 +10,7 @@ class CommonTableExpressionPartCollection implements QueryPart
 {
     protected array $commonTableExpressions = [];
 
-    public function add(CommonTableExpressionPart $commonTableExpression): self
+    public function add(CommonTableExpressionPart $commonTableExpression): static
     {
         $this->commonTableExpressions[] = $commonTableExpression;
 

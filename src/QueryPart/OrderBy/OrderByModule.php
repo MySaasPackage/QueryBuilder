@@ -10,7 +10,7 @@ trait OrderByModule
 {
     protected OrderByPartCollection|null $orderByPartCollection = null;
 
-    protected function addOrderByPartToCollection(OrderByPart $orderBy): self
+    protected function addOrderByPartToCollection(OrderByPart $orderBy): static
     {
         $this->orderByPartCollection ??= new OrderByPartCollection();
         $this->orderByPartCollection->add($orderBy);
@@ -18,14 +18,14 @@ trait OrderByModule
         return $this;
     }
 
-    public function orderBy(string $column, string $direction = 'ASC'): self
+    public function orderBy(string $column, string $direction = 'ASC'): static
     {
         $this->addOrderByPartToCollection(new OrderByPart(new StringablePart($column), $direction));
 
         return $this;
     }
 
-    public function addOrderBy(string $column, string $direction = 'ASC'): self
+    public function addOrderBy(string $column, string $direction = 'ASC'): static
     {
         $this->addOrderByPartToCollection(new OrderByPart(new StringablePart($column), $direction));
 

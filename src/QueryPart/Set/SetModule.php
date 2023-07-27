@@ -8,7 +8,7 @@ trait SetModule
 {
     protected SetPart|null $setPart = null;
 
-    public function set(array $values = []): self
+    public function set(array $values = []): static
     {
         $this->setPart = new SetPart($values);
 

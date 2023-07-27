@@ -8,7 +8,7 @@ trait WhereModule
 {
     protected WherePartCollection|null $wherePartsCollection = null;
 
-    protected function addWhere(WherePart $wherePart): self
+    protected function addWhere(WherePart $wherePart): static
     {
         $this->wherePartsCollection ??= new WherePartCollection();
         $this->wherePartsCollection->add($wherePart);
@@ -16,21 +16,21 @@ trait WhereModule
         return $this;
     }
 
-    public function where(string $condition): self
+    public function where(string $condition): static
     {
         $this->addWhere(new WherePart($condition));
 
         return $this;
     }
 
-    public function andWhere(string $condition): self
+    public function andWhere(string $condition): static
     {
         $this->addWhere(new WherePart($condition, Where::AND));
 
         return $this;
     }
 
-    public function orWhere(string $condition): self
+    public function orWhere(string $condition): static
     {
         $this->addWhere(new WherePart($condition, Where::OR));
 

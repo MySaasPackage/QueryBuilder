@@ -8,7 +8,7 @@ trait LimitModule
 {
     protected LimitPart|null $limitPart = null;
 
-    public function limit(int $limit, int $offset = null): self
+    public function limit(int $limit, int $offset = null): static
     {
         $this->limitPart = new LimitPart($this->drive, $limit, $offset);
 

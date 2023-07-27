@@ -22,7 +22,7 @@ class InsertQueryBuilder implements QueryBuilder
     {
     }
 
-    public function into(string $table): self
+    public function into(string $table): static
     {
         $this->table($table);
 

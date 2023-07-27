@@ -11,7 +11,7 @@ class ParameterPartCollection
     ) {
     }
 
-    public function add(ParameterPart $param): self
+    public function add(ParameterPart $param): static
     {
         $this->params[] = $param;
 
