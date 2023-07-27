@@ -13,6 +13,7 @@ use MySaasPackage\Support\QueryPart\Set\SetModule;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Limit\LimitModule;
+use MySaasPackage\Support\QueryPart\Table\TableModule;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
@@ -32,6 +33,7 @@ class QueryBuilder implements Part
     use HavingByModule;
     use ReturningModule;
     use SetModule;
+    use TableModule;
     use CommonTableExpressionModule;
 
     protected array $parts = [];
@@ -111,20 +113,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function table(string $table, string $alias = null): self
-    {
-        $this->parts[TablePart::class] = new TablePart($table, $alias);
-
-        return $this;
-    }
-
-    public function from(string $table, string $alias = null): self
-    {
-        $this->parts[TablePart::class] = new TablePart($table, $alias);
-
-        return $this;
-    }
-
     protected function addParam(ParameterPart $param): self
     {
         $this->parts[ParameterPartCollection::class] ??= new ParameterPartCollection();
@@ -166,9 +154,7 @@ class QueryBuilder implements Part
 
     public function __toSelect(): string
     {
-        $table = $this->parts[TablePart::class]->__toString();
-
-        $sql = "SELECT {$this->__toColumns()} FROM {$table}";
+        $sql = "SELECT {$this->__toColumns()} FROM {$this->__toTable()}";
 
         if ($this->commonTableExpressionPartCollection) {
             $sql = "{$this->__toCommonTableExpression()} {$sql}";
@@ -207,10 +193,9 @@ class QueryBuilder implements Part
 
     public function __toInsert(): string
     {
-        $table = $this->parts[TablePart::class]->__toString();
         $values = $this->parts[ValuesPart::class]->__toString();
 
-        $sql = "INSERT INTO {$table} ({$this->__toColumns()}) {$values}";
+        $sql = "INSERT INTO {$this->__toTable()} ({$this->__toColumns()}) {$values}";
 
         if ($this->returningPart) {
             $sql = "{$sql} {$this->__toReturning()}";
@@ -221,9 +206,7 @@ class QueryBuilder implements Part
 
     public function __toUpdate(): string
     {
-        $table = $this->parts[TablePart::class]->__toString();
-
-        $sql = "UPDATE {$table} {$this->__toSet()}";
+        $sql = "UPDATE {$this->__toTable()} {$this->__toSet()}";
 
         if ($this->wherePartsCollection) {
             $sql = "{$sql} {$this->__toWhere()}";
@@ -238,9 +221,7 @@ class QueryBuilder implements Part
 
     public function __toDelete(): string
     {
-        $table = $this->parts[TablePart::class]->__toString();
-
-        $sql = "DELETE FROM {$table}";
+        $sql = "DELETE FROM {$this->__toTable()}";
 
         if ($this->returningPart) {
             $sql = "{$sql} {$this->__toReturning()}";
