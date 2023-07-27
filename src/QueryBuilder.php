@@ -9,10 +9,10 @@ use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\ValuesPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
+use MySaasPackage\Support\QueryPart\Set\SetModule;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Limit\LimitModule;
-use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
@@ -31,6 +31,7 @@ class QueryBuilder implements Part
     use LimitModule;
     use HavingByModule;
     use ReturningModule;
+    use SetModule;
     use CommonTableExpressionModule;
 
     protected array $parts = [];
@@ -99,17 +100,6 @@ class QueryBuilder implements Part
     {
         $this->parts[self::TYPE] = self::UPDATE;
         $this->parts[TablePart::class] = new TablePart($table);
-
-        return $this;
-    }
-
-    public function set(array $values = []): self
-    {
-        if (self::UPDATE !== $this->parts[self::TYPE]) {
-            throw new RuntimeException('You can only use set() with update()');
-        }
-
-        $this->parts[UpdateSetValuesPart::class] = new UpdateSetValuesPart($values);
 
         return $this;
     }
@@ -232,9 +222,8 @@ class QueryBuilder implements Part
     public function __toUpdate(): string
     {
         $table = $this->parts[TablePart::class]->__toString();
-        $set = $this->parts[UpdateSetValuesPart::class]->__toString();
 
-        $sql = "UPDATE {$table} {$set}";
+        $sql = "UPDATE {$table} {$this->__toSet()}";
 
         if ($this->wherePartsCollection) {
             $sql = "{$sql} {$this->__toWhere()}";

@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\Support\QueryPart\Set;
 
-class UpdateSetValuesPart implements Part
+use MySaasPackage\Support\QueryPart\Part;
+
+class SetPart implements Part
 {
     public function __construct(
         public readonly array $values,
