@@ -22,7 +22,7 @@ trait JoinModule
     public function join(Stringable|string $table, string $alias, Stringable|string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
-            type: Join::JOIN,
+            type: Join::Join,
             table: new TablePart($table, $alias),
             condition: $condition
         ));
@@ -33,7 +33,7 @@ trait JoinModule
     public function leftJoin(Stringable|string $table, string $alias, Stringable|string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
-            type: Join::LEFT_JOIN,
+            type: Join::LeftJoin,
             table: new TablePart($table, $alias),
             condition: $condition
         ));
@@ -44,7 +44,7 @@ trait JoinModule
     public function rightJoin(Stringable|string $table, string $alias, Stringable|string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
-            type: Join::RIGHT_JOIN,
+            type: Join::RightJoin,
             table: new TablePart($table, $alias),
             condition: $condition
         ));
@@ -55,7 +55,7 @@ trait JoinModule
     public function innerJoin(Stringable|string $table, string $alias, Stringable|string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
-            type: Join::INNER_JOIN,
+            type: Join::InnerJoin,
             table: new TablePart($table, $alias),
             condition: $condition
         ));

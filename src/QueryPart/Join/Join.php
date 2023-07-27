@@ -6,10 +6,10 @@ namespace MySaasPackage\Support\QueryPart\Join;
 
 enum Join: string
 {
-    case JOIN = 'JOIN';
-    case INNER_JOIN = 'INNER JOIN';
-    case LEFT_JOIN = 'LEFT JOIN';
-    case RIGHT_JOIN = 'RIGHT JOIN';
-    case CROSS_JOIN = 'CROSS JOIN';
-    case FULL_JOIN = 'FULL JOIN';
+    case Join = 'JOIN';
+    case InnerJoin = 'INNER JOIN';
+    case LeftJoin = 'LEFT JOIN';
+    case RightJoin = 'RIGHT JOIN';
+    case CrossJoin = 'CROSS JOIN';
+    case FullJoin = 'FULL JOIN';
 }
