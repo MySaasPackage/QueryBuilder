@@ -26,6 +26,19 @@ final class PostgreSQLQueryBuilderTest extends TestCase
         $this->assertEquals('SELECT s.id AS subscription__id, s.uuid AS subscription__uuid, s.first_name AS subscription__first_name, s.last_name AS subscription__last_name, s.email AS subscription__email, s.phone AS subscription__phone FROM management.subscriptions AS s WHERE s.uuid = \'69e5e669-910a-4e8c-9529-7142b1ae0655\'', $query->__toString());
     }
 
+    public function testSelectWithWhereInSubSelect(): void
+    {
+        $subQuery = QueryBuilder::postgres()->select(['order_id'])->from('order_items')->where('items_name = :name')->setParameter('name', 'Widget');
+
+        $query = QueryBuilder::postgres()
+            ->select(['*'])
+            ->from('orders')
+            ->where('orders_id IN :orders')
+            ->setParameter('orders', $subQuery);
+
+        $this->assertEquals('SELECT * FROM orders WHERE orders_id IN (SELECT order_id FROM order_items WHERE items_name = \'Widget\')', $query->__toString());
+    }
+
     public function testSelectWithSubSelect(): void
     {
         $avgRateQuery = QueryBuilder::postgres()->select(['AVG(rate)'])->from('film');
