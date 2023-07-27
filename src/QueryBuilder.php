@@ -9,16 +9,14 @@ use MySaasPackage\Support\QueryPart\DeleteQueryBuilder;
 use MySaasPackage\Support\QueryPart\InsertQueryBuilder;
 use MySaasPackage\Support\QueryPart\SelectQueryBuilder;
 use MySaasPackage\Support\QueryPart\UpdateQueryBuilder;
+use MySaasPackage\Support\QueryPart\QueryBuilder as QueryBuilderContract;
 
 class QueryBuilder
 {
+    protected array $commonTableExpressionPartCollection = [];
+
     public function __construct(protected DbDriver $driver)
     {
-    }
-
-    public static function create(DbDriver $driver): self
-    {
-        return new self($driver);
     }
 
     public static function postgres(): self
@@ -31,10 +29,24 @@ class QueryBuilder
         return new self(DbDriver::MySQL);
     }
 
+    public function with(string $alias, QueryBuilderContract $query): self
+    {
+        $this->commonTableExpressionPartCollection[] = [
+            'alias' => $alias,
+            'query' => $query,
+        ];
+
+        return $this;
+    }
+
     public function select(array $columns = ['*']): SelectQueryBuilder
     {
         $queryBuilder = new SelectQueryBuilder($this->driver);
         $queryBuilder->columns($columns);
+
+        foreach ($this->commonTableExpressionPartCollection as $commonTableExpression) {
+            $queryBuilder->with($commonTableExpression['alias'], $commonTableExpression['query']);
+        }
 
         return $queryBuilder;
     }
