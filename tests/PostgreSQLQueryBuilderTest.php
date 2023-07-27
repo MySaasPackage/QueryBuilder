@@ -105,6 +105,21 @@ final class PostgreSQLQueryBuilderTest extends TestCase
         $this->assertEquals('SELECT s.id AS subscription__id, s.uuid AS subscription__uuid, s.first_name AS subscription__first_name, s.last_name AS subscription__last_name, s.email AS subscription__email, s.phone AS subscription__phone FROM management.subscriptions AS s ORDER BY s.id ASC NULLS FIRST', $query->__toString());
     }
 
+    public function testSelectWithHaving(): void
+    {
+        $query = QueryBuilder::postgres()
+            ->select([
+                'o.customer_id AS orders__customer__id',
+                'SUM(o.total_amount) AS orders__total_sales',
+            ])
+            ->from('shop.orders', 'o')
+            ->groupBy('o.customer_id')
+            ->having('SUM(o.total_amount) > :total_sales')
+            ->setParameter('total_sales', 1000);
+
+        $this->assertEquals('SELECT o.customer_id AS orders__customer__id, SUM(o.total_amount) AS orders__total_sales FROM shop.orders AS o GROUP BY o.customer_id HAVING SUM(o.total_amount) > 1000', $query->__toString());
+    }
+
     public function testInsert(): void
     {
         $query = QueryBuilder::postgres()

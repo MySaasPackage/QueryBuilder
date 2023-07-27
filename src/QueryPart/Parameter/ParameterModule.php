@@ -34,7 +34,7 @@ trait ParameterModule
 
         foreach ($this->parameterPartCollection->params as $param) {
             $patterns[] = is_int($param->key) ? '/\?/' : sprintf('/:%s/', $param->key);
-            $replacements[] = $param->__toString();
+            $replacements[] = is_int($param->value) ? $param->value : $param->__toString();
         }
 
         return preg_replace($patterns, $replacements, $sql, 1);

@@ -9,7 +9,7 @@ use MySaasPackage\Support\QueryPart\StringablePart;
 
 class GroupByPart implements QueryPart
 {
-    public readonly array $columns;
+    public array $columns;
 
     public function add(StringablePart $column): static
     {
