@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\OrderBy;
 
-use MySaasPackage\Support\QueryPart\Columns\ColumnPart;
+use MySaasPackage\Support\QueryPart\StringablePart;
 
 trait OrderByTrait
 {
@@ -20,7 +20,7 @@ trait OrderByTrait
 
     public function orderBy(string $column, string $direction = 'ASC'): self
     {
-        $this->addOrderBy(new OrderByPart(new ColumnPart($column), $direction));
+        $this->addOrderBy(new OrderByPart(new StringablePart($column), $direction));
 
         return $this;
     }

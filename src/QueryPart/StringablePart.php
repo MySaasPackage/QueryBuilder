@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Columns;
+namespace MySaasPackage\Support\QueryPart;
 
 use MySaasPackage\Support\QueryBuilder;
-use MySaasPackage\Support\QueryPart\Part;
 
-class ColumnPart implements Part
+class StringablePart implements Part
 {
     public function __construct(
         public readonly mixed $value,
