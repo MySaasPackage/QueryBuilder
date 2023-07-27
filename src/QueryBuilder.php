@@ -8,7 +8,6 @@ use RuntimeException;
 use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\ValuesPart;
-use MySaasPackage\Support\QueryPart\HavingByPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
@@ -18,6 +17,7 @@ use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
+use MySaasPackage\Support\QueryPart\HavingBy\HavingByModule;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
 use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
 
@@ -29,6 +29,7 @@ class QueryBuilder implements Part
     use ColumnsModule;
     use GroupByModule;
     use LimitModule;
+    use HavingByModule;
     use CommonTableExpressionModule;
 
     protected array $parts = [];
@@ -155,13 +156,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function having(string $condition): self
-    {
-        $this->parts[HavingByPart::class] = new HavingByPart($condition);
-
-        return $this;
-    }
-
     protected function bindParameterParts(string $sql): string
     {
         if (!isset($this->parts[ParameterPartCollection::class])) {
@@ -212,9 +206,8 @@ class QueryBuilder implements Part
             $sql = "{$sql} {$this->__toGroupBySql()}";
         }
 
-        if (isset($this->parts[HavingByPart::class])) {
-            $harving = $this->parts[HavingByPart::class]->__toString();
-            $sql = "{$sql} {$harving}";
+        if ($this->havingByPart) {
+            $sql = "{$sql} {$this->__toHavingBy()}";
         }
 
         if ($this->limitPart) {

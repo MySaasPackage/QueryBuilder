@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\GroupBy;
 
-use MySaasPackage\Support\QueryPart\StringablePart;
+use MySaasPackage\Support\QueryPart\HavingBy\StringablePart;
 
 trait GroupByModule
 {
