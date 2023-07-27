@@ -9,7 +9,6 @@ use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\ValuesPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
-use MySaasPackage\Support\QueryPart\ReturningPart;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Limit\LimitModule;
@@ -223,9 +222,8 @@ class QueryBuilder implements Part
 
         $sql = "INSERT INTO {$table} ({$this->__toColumns()}) {$values}";
 
-        if (isset($this->parts[ReturningPart::class])) {
-            $returning = $this->parts[ReturningPart::class]->__toString();
-            $sql = "{$sql} {$returning}";
+        if ($this->returningPart) {
+            $sql = "{$sql} {$this->__toReturning()}";
         }
 
         return $sql;
@@ -238,14 +236,12 @@ class QueryBuilder implements Part
 
         $sql = "UPDATE {$table} {$set}";
 
-        if (isset($this->parts[WherePartCollection::class]) && $this->parts[WherePartCollection::class]->isNotEmpty()) {
-            $wheres = $this->parts[WherePartCollection::class]->__toString();
-            $sql = "{$sql} {$wheres}";
+        if ($this->wherePartsCollection) {
+            $sql = "{$sql} {$this->__toWhere()}";
         }
 
-        if (isset($this->parts[ReturningPart::class])) {
-            $returning = $this->parts[ReturningPart::class]->__toString();
-            $sql = "{$sql} {$returning}";
+        if ($this->returningPart) {
+            $sql = "{$sql} {$this->__toReturning()}";
         }
 
         return $sql;
@@ -257,14 +253,8 @@ class QueryBuilder implements Part
 
         $sql = "DELETE FROM {$table}";
 
-        if (isset($this->parts[WherePartCollection::class]) && $this->parts[WherePartCollection::class]->isNotEmpty()) {
-            $wheres = $this->parts[WherePartCollection::class]->__toString();
-            $sql = "{$sql} {$wheres}";
-        }
-
-        if (isset($this->parts[ReturningPart::class])) {
-            $returning = $this->parts[ReturningPart::class]->__toString();
-            $sql = "{$sql} {$returning}";
+        if ($this->returningPart) {
+            $sql = "{$sql} {$this->__toReturning()}";
         }
 
         return $sql;
