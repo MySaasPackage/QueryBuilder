@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Values;
+namespace MySaasPackage\Support\QueryPart\KeyValue;
 
-trait ValuesModule
+trait KeyValueModule
 {
     protected ValuesPart|null $valuesPart = null;
     protected KeysPart|null $keysPart = null;

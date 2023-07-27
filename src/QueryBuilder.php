@@ -12,11 +12,11 @@ use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Limit\LimitModule;
 use MySaasPackage\Support\QueryPart\Table\TableModule;
-use MySaasPackage\Support\QueryPart\Values\ValuesModule;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
 use MySaasPackage\Support\QueryPart\HavingBy\HavingByModule;
+use MySaasPackage\Support\QueryPart\KeyValue\KeyValueModule;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
 use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
 use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
@@ -32,8 +32,8 @@ class QueryBuilder implements Part
     use HavingByModule;
     use ReturningModule;
     use SetModule;
-    use ValuesModule;
     use TableModule;
+    use KeyValueModule;
     use CommonTableExpressionModule;
 
     protected array $parts = [];
