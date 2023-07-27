@@ -113,6 +113,23 @@ final class PostgreSQLQueryBuilderTest extends TestCase
                 's.phone AS subscription__phone',
             ])
             ->from('management.subscriptions', 's')
+            ->orderBy('s.id');
+
+        $this->assertEquals('SELECT s.id AS subscription__id, s.uuid AS subscription__uuid, s.first_name AS subscription__first_name, s.last_name AS subscription__last_name, s.email AS subscription__email, s.phone AS subscription__phone FROM management.subscriptions AS s ORDER BY s.id', $query->__toString());
+    }
+
+    public function testSelectWithOrderByNullFirst(): void
+    {
+        $query = QueryBuilder::postgres()
+            ->select([
+                's.id AS subscription__id',
+                's.uuid AS subscription__uuid',
+                's.first_name AS subscription__first_name',
+                's.last_name AS subscription__last_name',
+                's.email AS subscription__email',
+                's.phone AS subscription__phone',
+            ])
+            ->from('management.subscriptions', 's')
             ->orderBy('s.id', 'ASC NULLS FIRST');
 
         $this->assertEquals('SELECT s.id AS subscription__id, s.uuid AS subscription__uuid, s.first_name AS subscription__first_name, s.last_name AS subscription__last_name, s.email AS subscription__email, s.phone AS subscription__phone FROM management.subscriptions AS s ORDER BY s.id ASC NULLS FIRST', $query->__toString());
