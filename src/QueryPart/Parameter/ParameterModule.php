@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Parameter;
 
+use Stringable;
+
 trait ParameterModule
 {
     protected ParameterPartCollection|null $parameterPartCollection = null;
@@ -23,20 +25,12 @@ trait ParameterModule
         return $this;
     }
 
-    protected function bindParameterParts(string $sql): string
+    protected function bind(Stringable|string $query): Stringable|string
     {
         if (null === $this->parameterPartCollection) {
-            return $sql;
+            return $query;
         }
 
-        $patterns = [];
-        $replacements = [];
-
-        foreach ($this->parameterPartCollection->params as $param) {
-            $patterns[] = $param->getKey();
-            $replacements[] = $param->getValue();
-        }
-
-        return preg_replace($patterns, $replacements, $sql, 1);
+        return $this->parameterPartCollection->bind($query);
     }
 }

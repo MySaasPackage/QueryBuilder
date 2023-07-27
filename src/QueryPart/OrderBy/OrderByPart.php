@@ -17,9 +17,9 @@ class OrderByPart implements Stringable
     public function __toString(): string
     {
         if (null === $this->direction) {
-            return strval($this->column);
+            return $this->column;
         }
 
-        return sprintf('%s %s', strval($this->column), $this->direction);
+        return sprintf('%s %s', $this->column, $this->direction);
     }
 }

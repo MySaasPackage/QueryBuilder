@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Parameter;
 
+use Stringable;
+
 class ParameterPartCollection
 {
-    public function __construct(
-        public array $params = []
-    ) {
-    }
+    public array $params = [];
 
     public function add(ParameterPart $param): static
     {
@@ -18,8 +17,20 @@ class ParameterPartCollection
         return $this;
     }
 
-    public function isNotEmpty(): bool
+    public function bind(Stringable|string $sql): Stringable|string
     {
-        return 0 !== count($this->params);
+        if (null === $this->params) {
+            return $sql;
+        }
+
+        $patterns = [];
+        $replacements = [];
+
+        foreach ($this->params as $param) {
+            $patterns[] = $param->getKey();
+            $replacements[] = $param->getValue();
+        }
+
+        return preg_replace($patterns, $replacements, $sql, 1);
     }
 }

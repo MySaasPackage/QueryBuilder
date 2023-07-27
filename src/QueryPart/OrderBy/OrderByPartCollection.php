@@ -15,11 +15,6 @@ class OrderByPartCollection implements Stringable
         $this->orderByParts[] = $part;
     }
 
-    public function isNotEmpty(): bool
-    {
-        return 0 !== count($this->orderByParts);
-    }
-
     public function __toString(): string
     {
         if (0 === count($this->orderByParts)) {

@@ -17,11 +17,6 @@ class CommonTableExpressionPartCollection implements Stringable
         return $this;
     }
 
-    public function isNotEmpty(): bool
-    {
-        return 0 !== count($this->commonTableExpressions);
-    }
-
     public function __toString()
     {
         if (0 === count($this->commonTableExpressions)) {

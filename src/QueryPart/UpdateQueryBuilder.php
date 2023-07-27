@@ -36,6 +36,6 @@ class UpdateQueryBuilder implements QueryBuilder
             $sql = "{$sql} {$this->__toReturning()}";
         }
 
-        return $this->bindParameterParts($sql);
+        return $this->bind($sql);
     }
 }

@@ -12,12 +12,12 @@ class JoinPart implements Stringable
     public function __construct(
         public readonly Join $type,
         public readonly TablePart $table,
-        public readonly string $condition
+        public readonly Stringable|string $condition
     ) {
     }
 
     public function __toString(): string
     {
-        return sprintf('%s %s ON %s', $this->type->value, strval($this->table), $this->condition);
+        return sprintf('%s %s ON %s', $this->type->value, $this->table, $this->condition);
     }
 }

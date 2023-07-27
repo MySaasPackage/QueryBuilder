@@ -23,6 +23,6 @@ class GroupByPart implements Stringable
             return '';
         }
 
-        return 'GROUP BY ' . implode(', ', array_map(fn ($column) => strval($column), $this->columns));
+        return 'GROUP BY ' . implode(', ', $this->columns);
     }
 }
