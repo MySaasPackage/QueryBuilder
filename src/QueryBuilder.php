@@ -6,7 +6,6 @@ namespace MySaasPackage\Support;
 
 use RuntimeException;
 use MySaasPackage\Support\QueryPart\Part;
-use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\Set\SetModule;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
@@ -17,7 +16,7 @@ use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
 use MySaasPackage\Support\QueryPart\HavingBy\HavingByModule;
 use MySaasPackage\Support\QueryPart\KeyValue\KeyValueModule;
-use MySaasPackage\Support\QueryPart\ParameterPartCollection;
+use MySaasPackage\Support\QueryPart\Parameter\ParameterModule;
 use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
 use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
 
@@ -34,6 +33,7 @@ class QueryBuilder implements Part
     use SetModule;
     use TableModule;
     use KeyValueModule;
+    use ParameterModule;
     use CommonTableExpressionModule;
 
     protected array $parts = [];
@@ -99,45 +99,6 @@ class QueryBuilder implements Part
         $this->parts[self::TYPE] = self::DELETE;
 
         return $this;
-    }
-
-    protected function addParam(ParameterPart $param): self
-    {
-        $this->parts[ParameterPartCollection::class] ??= new ParameterPartCollection();
-        $this->parts[ParameterPartCollection::class]->add($param);
-
-        return $this;
-    }
-
-    public function setParameter(string|int $key, $value): self
-    {
-        $this->addParam(new ParameterPart($key, $value));
-
-        return $this;
-    }
-
-    protected function bindParameterParts(string $sql): string
-    {
-        if (!isset($this->parts[ParameterPartCollection::class])) {
-            return $sql;
-        }
-
-        $params = $this->parts[ParameterPartCollection::class]->params;
-
-        $patterns = [];
-        $replacements = [];
-
-        foreach ($params as $param) {
-            if (is_int($param->key)) {
-                $patterns[] = '/\?/';
-            } else {
-                $patterns[] = sprintf('/:%s/', $param->key);
-            }
-
-            $replacements[] = strval($param->value);
-        }
-
-        return preg_replace($patterns, $replacements, $sql, 1);
     }
 
     public function __toSelect(): string

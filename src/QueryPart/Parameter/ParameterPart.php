@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\Support\QueryPart\Parameter;
 
 use MySaasPackage\Support\QueryBuilder;
+use MySaasPackage\Support\QueryPart\Part;
 
 class ParameterPart implements Part
 {
