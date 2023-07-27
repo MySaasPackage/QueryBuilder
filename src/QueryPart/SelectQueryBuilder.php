@@ -51,16 +51,16 @@ class SelectQueryBuilder implements QueryBuilder
             $sql = "{$sql} {$this->__toWhere()}";
         }
 
-        if ($this->orderByPartCollection) {
-            $sql = "{$sql} {$this->__toOrderBy()}";
-        }
-
         if ($this->groupByPart) {
             $sql = "{$sql} {$this->__toGroupBySql()}";
         }
 
         if ($this->havingByPart) {
             $sql = "{$sql} {$this->__toHavingBy()}";
+        }
+
+        if ($this->orderByPartCollection) {
+            $sql = "{$sql} {$this->__toOrderBy()}";
         }
 
         if ($this->limitPart) {

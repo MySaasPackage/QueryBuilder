@@ -11,16 +11,16 @@ class OrderByPart implements QueryPart
 {
     public function __construct(
         public readonly StringablePart $column,
-        public readonly string $direction,
+        public string|null $direction = null,
     ) {
     }
 
     public function __toString(): string
     {
-        return sprintf(
-            '%s %s',
-            $this->column,
-            $this->direction,
-        );
+        if (null === $this->direction) {
+            return $this->column->__toString();
+        }
+
+        return sprintf('%s %s', $this->column->__toString(), $this->direction);
     }
 }

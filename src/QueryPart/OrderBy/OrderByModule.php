@@ -18,15 +18,17 @@ trait OrderByModule
         return $this;
     }
 
-    public function orderBy(string $column, string $direction = 'ASC'): static
+    public function orderBy(string $column, string $direction = null): static
     {
         $this->addOrderByPartToCollection(new OrderByPart(new StringablePart($column), $direction));
 
         return $this;
     }
 
-    public function addOrderBy(string $column, string $direction = 'ASC'): static
+    public function addOrderBy(string $column, string $direction = null): static
     {
+        $direction ??= 'ASC';
+
         $this->addOrderByPartToCollection(new OrderByPart(new StringablePart($column), $direction));
 
         return $this;
