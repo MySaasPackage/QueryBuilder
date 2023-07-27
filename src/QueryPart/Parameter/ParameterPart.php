@@ -15,6 +15,11 @@ class ParameterPart implements QueryPart
     ) {
     }
 
+    public function isNumeric(): bool
+    {
+        return is_int($this->value) || is_float($this->value);
+    }
+
     public function stringify(mixed $value): string
     {
         if ($value instanceof QueryBuilder) {

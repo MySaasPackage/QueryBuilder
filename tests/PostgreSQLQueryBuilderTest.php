@@ -115,9 +115,9 @@ final class PostgreSQLQueryBuilderTest extends TestCase
             ->from('shop.orders', 'o')
             ->groupBy('o.customer_id')
             ->having('SUM(o.total_amount) > :total_sales')
-            ->setParameter('total_sales', 1000);
+            ->setParameter('total_sales', 1000.1);
 
-        $this->assertEquals('SELECT o.customer_id AS orders__customer__id, SUM(o.total_amount) AS orders__total_sales FROM shop.orders AS o GROUP BY o.customer_id HAVING SUM(o.total_amount) > 1000', $query->__toString());
+        $this->assertEquals('SELECT o.customer_id AS orders__customer__id, SUM(o.total_amount) AS orders__total_sales FROM shop.orders AS o GROUP BY o.customer_id HAVING SUM(o.total_amount) > 1000.1', $query->__toString());
     }
 
     public function testInsert(): void
