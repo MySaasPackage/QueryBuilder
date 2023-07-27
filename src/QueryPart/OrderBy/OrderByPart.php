@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\OrderBy;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 use MySaasPackage\Support\QueryPart\StringablePart;
 
-class OrderByPart implements QueryPart
+class OrderByPart implements Stringable
 {
     public function __construct(
-        public readonly StringablePart $column,
+        public readonly StringablePart|string $column,
         public string|null $direction = null,
     ) {
     }
@@ -18,9 +18,9 @@ class OrderByPart implements QueryPart
     public function __toString(): string
     {
         if (null === $this->direction) {
-            return $this->column->__toString();
+            return strval($this->column);
         }
 
-        return sprintf('%s %s', $this->column->__toString(), $this->direction);
+        return sprintf('%s %s', strval($this->column), $this->direction);
     }
 }

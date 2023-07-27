@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Where;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 
-class WherePartCollection implements QueryPart
+class WherePartCollection implements Stringable
 {
     public function __construct(
         protected array $parts = []

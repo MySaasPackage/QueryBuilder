@@ -34,6 +34,6 @@ trait ColumnsModule
 
     public function __toColumns(): string
     {
-        return $this->columns?->__toString();
+        return $this->columns?->__toString() ?? '';
     }
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\CommonTableExpression;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 
-class CommonTableExpressionPartCollection implements QueryPart
+class CommonTableExpressionPartCollection implements Stringable
 {
     protected array $commonTableExpressions = [];
 

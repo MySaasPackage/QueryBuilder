@@ -60,12 +60,14 @@ final class PostgreSQLQueryBuilderTest extends TestCase
                 'uuid' => ':uuid',
                 'first_name' => ':first_name',
                 'last_name' => ':last_name',
+                'age' => ':age',
                 'email' => ':email',
                 'phone' => ':phone',
             ])
             ->setParameter('uuid', '69e5e669-910a-4e8c-9529-7142b1ae0655')
             ->setParameter('first_name', 'John')
             ->setParameter('last_name', 'Doe')
+            ->setParameter('age', 28)
             ->setParameter('email', 'john@gmail.com')
             ->setParameter('phone', '+11234567890');
 
@@ -81,7 +83,7 @@ final class PostgreSQLQueryBuilderTest extends TestCase
             ])
             ->from('INSERTED_SUBSCRIPTION', 's');
 
-        $this->assertEquals('WITH INSERTED_SUBSCRIPTION AS (INSERT INTO management.subscriptions (uuid, first_name, last_name, email, phone) VALUES (\'69e5e669-910a-4e8c-9529-7142b1ae0655\', \'John\', \'Doe\', \'john@gmail.com\', \'+11234567890\')) SELECT s.id AS subscription__id, s.uuid AS subscription__uuid, s.first_name AS subscription__first_name, s.last_name AS subscription__last_name, s.email AS subscription__email, s.phone AS subscription__phone FROM INSERTED_SUBSCRIPTION AS s', $query->__toString());
+        $this->assertEquals('WITH INSERTED_SUBSCRIPTION AS (INSERT INTO management.subscriptions (uuid, first_name, last_name, age, email, phone) VALUES (\'69e5e669-910a-4e8c-9529-7142b1ae0655\', \'John\', \'Doe\', 28, \'john@gmail.com\', \'+11234567890\')) SELECT s.id AS subscription__id, s.uuid AS subscription__uuid, s.first_name AS subscription__first_name, s.last_name AS subscription__last_name, s.email AS subscription__email, s.phone AS subscription__phone FROM INSERTED_SUBSCRIPTION AS s', $query->__toString());
     }
 
     public function testSelectWithLimit(): void

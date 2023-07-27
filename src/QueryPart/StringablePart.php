@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
-class StringablePart implements QueryPart
+use Stringable;
+
+class StringablePart implements Stringable
 {
     public function __construct(
         public readonly mixed $value,
@@ -15,10 +17,6 @@ class StringablePart implements QueryPart
     {
         if ($value instanceof QueryBuilder) {
             return sprintf('(%s)', $value->__toString());
-        }
-
-        if ($value instanceof QueryPart) {
-            return $value->__toString();
         }
 
         return strval($value);

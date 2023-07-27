@@ -34,6 +34,6 @@ trait GroupByModule
 
     protected function __toGroupBySql(): string
     {
-        return $this->groupByPart?->__toString();
+        return $this->groupByPart?->__toString() ?? '';
     }
 }

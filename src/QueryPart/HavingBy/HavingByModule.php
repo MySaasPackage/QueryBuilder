@@ -10,15 +10,15 @@ trait HavingByModule
 {
     protected HavingByPart|null $havingByPart = null;
 
-    public function having(string $condition): static
+    public function having(StringablePart|string $condition): static
     {
-        $this->havingByPart = new HavingByPart(new StringablePart($condition));
+        $this->havingByPart = new HavingByPart($condition);
 
         return $this;
     }
 
     public function __toHavingBy(): string
     {
-        return $this->havingByPart?->__toString();
+        return $this->havingByPart?->__toString() ?? '';
     }
 }

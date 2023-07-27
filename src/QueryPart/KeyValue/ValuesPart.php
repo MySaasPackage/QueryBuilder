@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\KeyValue;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 
-class ValuesPart implements QueryPart
+class ValuesPart implements Stringable
 {
     public function __construct(
         public readonly array $columns,

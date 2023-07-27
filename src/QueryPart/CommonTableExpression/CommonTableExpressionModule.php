@@ -27,6 +27,6 @@ trait CommonTableExpressionModule
 
     protected function __toCommonTableExpression(): string
     {
-        return $this->commonTableExpressionPartCollection->__toString();
+        return $this->commonTableExpressionPartCollection?->__toString() ?? '';
     }
 }

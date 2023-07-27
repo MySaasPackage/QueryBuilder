@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Limit;
 
+use Stringable;
 use InvalidArgumentException;
 use MySaasPackage\Support\QueryPart\DbDriver;
-use MySaasPackage\Support\QueryPart\QueryPart;
 use MySaasPackage\Support\QueryPart\DrivablePart;
 
-class LimitPart implements QueryPart, DrivablePart
+class LimitPart implements Stringable, DrivablePart
 {
     public function __construct(
         public readonly DbDriver $driver,

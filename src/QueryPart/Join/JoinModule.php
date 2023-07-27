@@ -19,44 +19,44 @@ trait JoinModule
         return $this;
     }
 
-    public function join(string $table, string $alias, string $condition): static
+    public function join(StringablePart|string $table, string $alias, string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::JOIN,
-            table: new TablePart(new StringablePart($table), $alias),
+            table: new TablePart($table, $alias),
             condition: $condition
         ));
 
         return $this;
     }
 
-    public function leftJoin(string $table, string $alias, string $condition): static
+    public function leftJoin(StringablePart|string $table, string $alias, string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::LEFT_JOIN,
-            table: new TablePart(new StringablePart($table), $alias),
+            table: new TablePart($table, $alias),
             condition: $condition
         ));
 
         return $this;
     }
 
-    public function rightJoin(string $table, string $alias, string $condition): static
+    public function rightJoin(StringablePart|string $table, string $alias, string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::RIGHT_JOIN,
-            table: new TablePart(new StringablePart($table), $alias),
+            table: new TablePart($table, $alias),
             condition: $condition
         ));
 
         return $this;
     }
 
-    public function innerJoin(string $table, string $alias, string $condition): static
+    public function innerJoin(StringablePart|string $table, string $alias, string $condition): static
     {
         $this->addJoinPartToCollection(new JoinPart(
             type: Join::INNER_JOIN,
-            table: new TablePart(new StringablePart($table), $alias),
+            table: new TablePart($table, $alias),
             condition: $condition
         ));
 
@@ -65,6 +65,6 @@ trait JoinModule
 
     protected function __toJoin(): string
     {
-        return $this->joinPartCollection->__toString();
+        return $this->joinPartCollection?->__toString() ?? '';
     }
 }

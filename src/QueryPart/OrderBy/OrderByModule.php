@@ -18,24 +18,24 @@ trait OrderByModule
         return $this;
     }
 
-    public function orderBy(string $column, string $direction = null): static
+    public function orderBy(StringablePart|string $column, string $direction = null): static
     {
-        $this->addOrderByPartToCollection(new OrderByPart(new StringablePart($column), $direction));
+        $this->addOrderByPartToCollection(new OrderByPart($column, $direction));
 
         return $this;
     }
 
-    public function addOrderBy(string $column, string $direction = null): static
+    public function addOrderBy(StringablePart|string $column, string $direction = null): static
     {
         $direction ??= 'ASC';
 
-        $this->addOrderByPartToCollection(new OrderByPart(new StringablePart($column), $direction));
+        $this->addOrderByPartToCollection(new OrderByPart($column, $direction));
 
         return $this;
     }
 
     protected function __toOrderBy(): string
     {
-        return $this->orderByPartCollection?->__toString();
+        return $this->orderByPartCollection?->__toString() ?? '';
     }
 }

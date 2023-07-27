@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Parameter;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 use MySaasPackage\Support\QueryPart\QueryBuilder;
 
-class ParameterPart implements QueryPart
+class ParameterPart implements Stringable
 {
     public function __construct(
         public readonly string|int $key,
@@ -20,22 +20,24 @@ class ParameterPart implements QueryPart
         return is_int($this->value) || is_float($this->value);
     }
 
+    public function getValue(): mixed
+    {
+        if ($this->isNumeric()) {
+            return $this->value;
+        }
+
+        return $this->__toString();
+    }
+
+    public function getKey(): string
+    {
+        return is_int($this->key) ? '/\?/' : sprintf('/:%s/', $this->key);
+    }
+
     public function stringify(mixed $value): string
     {
         if ($value instanceof QueryBuilder) {
             return sprintf('(%s)', $value->__toString());
-        }
-
-        if ($value instanceof QueryPart) {
-            return $value->__toString();
-        }
-
-        if (is_int($value)) {
-            return intval($value);
-        }
-
-        if (is_float($value)) {
-            return floatval($value);
         }
 
         if (is_bool($value)) {

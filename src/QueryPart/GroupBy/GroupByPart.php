@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\GroupBy;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 use MySaasPackage\Support\QueryPart\StringablePart;
 
-class GroupByPart implements QueryPart
+class GroupByPart implements Stringable
 {
     public array $columns;
 

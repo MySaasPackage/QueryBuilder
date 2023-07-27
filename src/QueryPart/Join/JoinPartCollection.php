@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Join;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 
-class JoinPartCollection implements QueryPart
+class JoinPartCollection implements Stringable
 {
     public function __construct(
         protected array $parts = []

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\HavingBy;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 use MySaasPackage\Support\QueryPart\StringablePart;
 
-class HavingByPart implements QueryPart
+class HavingByPart implements Stringable
 {
     public function __construct(
-        public readonly StringablePart $condition
+        public readonly StringablePart|string $condition
     ) {
     }
 
     public function __toString(): string
     {
-        return 'HAVING ' . $this->condition->__toString();
+        return 'HAVING ' . strval($this->condition);
     }
 }

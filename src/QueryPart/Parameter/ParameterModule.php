@@ -33,8 +33,8 @@ trait ParameterModule
         $replacements = [];
 
         foreach ($this->parameterPartCollection->params as $param) {
-            $patterns[] = is_int($param->key) ? '/\?/' : sprintf('/:%s/', $param->key);
-            $replacements[] = $param->isNumeric() ? $param->value : $param->__toString();
+            $patterns[] = $param->getKey();
+            $replacements[] = $param->getValue();
         }
 
         return preg_replace($patterns, $replacements, $sql, 1);

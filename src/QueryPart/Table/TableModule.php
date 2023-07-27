@@ -10,16 +10,16 @@ trait TableModule
 {
     protected TablePart|null $tablePart = null;
 
-    public function table(mixed $table, string $alias = null): static
+    public function table(StringablePart|string $table, string $alias = null): static
     {
-        $this->tablePart = new TablePart(new StringablePart($table), $alias);
+        $this->tablePart = new TablePart($table, $alias);
 
         return $this;
     }
 
-    public function from(mixed $table, string $alias = null): static
+    public function from(StringablePart|string $table, string $alias = null): static
     {
-        $this->tablePart = new TablePart(new StringablePart($table), $alias);
+        $this->tablePart = new TablePart($table, $alias);
 
         return $this;
     }

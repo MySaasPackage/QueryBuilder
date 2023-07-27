@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Where;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
+use MySaasPackage\Support\QueryPart\StringablePart;
 
-class WherePart implements QueryPart
+class WherePart implements Stringable
 {
     public function __construct(
-        public readonly string $condition,
+        public readonly StringablePart|string $condition,
         public readonly Where|null $type = null
     ) {
     }
 
     public function __toString(): string
     {
-        $sanitizedConditional = preg_replace('/"/', '\'', $this->condition);
+        $sanitizedConditional = preg_replace('/"/', '\'', strval($this->condition));
 
         if (null === $this->type) {
             return $sanitizedConditional;

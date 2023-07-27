@@ -17,6 +17,6 @@ trait LimitModule
 
     public function __toLimit(): string
     {
-        return $this->limitPart?->__toString();
+        return $this->limitPart?->__toString() ?? '';
     }
 }

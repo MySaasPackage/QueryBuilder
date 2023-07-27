@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Join;
 
-use MySaasPackage\Support\QueryPart\QueryPart;
+use Stringable;
 use MySaasPackage\Support\QueryPart\Table\TablePart;
 
-class JoinPart implements QueryPart
+class JoinPart implements Stringable
 {
     public function __construct(
         public readonly Join $type,
@@ -18,6 +18,6 @@ class JoinPart implements QueryPart
 
     public function __toString(): string
     {
-        return sprintf('%s %s ON %s', $this->type->value, $this->table->__toString(), $this->condition);
+        return sprintf('%s %s ON %s', $this->type->value, strval($this->table), $this->condition);
     }
 }

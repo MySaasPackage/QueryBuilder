@@ -17,6 +17,6 @@ trait ReturningModule
 
     public function __toReturning(): string
     {
-        return $this->returningPart?->__toString();
+        return $this->returningPart?->__toString() ?? '';
     }
 }
