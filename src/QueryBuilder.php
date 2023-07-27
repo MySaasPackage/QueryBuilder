@@ -6,14 +6,13 @@ namespace MySaasPackage\Support;
 
 use RuntimeException;
 use MySaasPackage\Support\QueryPart\Part;
-use MySaasPackage\Support\QueryPart\TablePart;
-use MySaasPackage\Support\QueryPart\ValuesPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\Set\SetModule;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Limit\LimitModule;
 use MySaasPackage\Support\QueryPart\Table\TableModule;
+use MySaasPackage\Support\QueryPart\Values\ValuesModule;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
@@ -33,6 +32,7 @@ class QueryBuilder implements Part
     use HavingByModule;
     use ReturningModule;
     use SetModule;
+    use ValuesModule;
     use TableModule;
     use CommonTableExpressionModule;
 
@@ -74,26 +74,14 @@ class QueryBuilder implements Part
     public function insert(string $table): self
     {
         $this->parts[self::TYPE] = self::INSERT;
-        $this->parts[TablePart::class] = new TablePart($table);
+        $this->table($table);
 
         return $this;
     }
 
     public function into(string $table): self
     {
-        $this->parts[TablePart::class] = new TablePart($table);
-
-        return $this;
-    }
-
-    public function values(array $values = []): self
-    {
-        if (self::INSERT !== $this->parts[self::TYPE]) {
-            throw new RuntimeException('You can only use values() with insert()');
-        }
-
-        $this->columns(array_keys($values));
-        $this->parts[ValuesPart::class] = new ValuesPart(array_values($values));
+        $this->table($table);
 
         return $this;
     }
@@ -101,7 +89,7 @@ class QueryBuilder implements Part
     public function update(string $table): self
     {
         $this->parts[self::TYPE] = self::UPDATE;
-        $this->parts[TablePart::class] = new TablePart($table);
+        $this->table($table);
 
         return $this;
     }
@@ -193,9 +181,7 @@ class QueryBuilder implements Part
 
     public function __toInsert(): string
     {
-        $values = $this->parts[ValuesPart::class]->__toString();
-
-        $sql = "INSERT INTO {$this->__toTable()} ({$this->__toColumns()}) {$values}";
+        $sql = "INSERT INTO {$this->__toTable()} ({$this->__toKeys()}) ({$this->__toValues()})";
 
         if ($this->returningPart) {
             $sql = "{$sql} {$this->__toReturning()}";

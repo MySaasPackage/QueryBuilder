@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\Support\QueryPart\Values;
+
+use MySaasPackage\Support\QueryPart\Part;
 
 class ValuesPart implements Part
 {
