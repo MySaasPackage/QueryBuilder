@@ -11,6 +11,7 @@ use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
 use MySaasPackage\Support\QueryPart\Limit\LimitModule;
 use MySaasPackage\Support\QueryPart\Table\TableModule;
+use MySaasPackage\Support\QueryPart\SelectQueryBuilder;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
@@ -44,13 +45,13 @@ class QueryBuilder implements Part
     public const UPDATE = 'update';
     public const DELETE = 'delete';
 
-    public function __construct(protected DbDriver $drive)
+    public function __construct(protected DbDriver $driver)
     {
     }
 
-    public static function create(DbDriver $drive): self
+    public static function create(DbDriver $driver): self
     {
-        return new self($drive);
+        return new self($driver);
     }
 
     public static function postgres(): self
@@ -63,12 +64,12 @@ class QueryBuilder implements Part
         return new self(DbDriver::MySQL);
     }
 
-    public function select(array $columns = ['*']): self
+    public function select(array $columns = ['*']): SelectQueryBuilder
     {
-        $this->parts[self::TYPE] = self::SELECT;
-        $this->columns($columns);
+        $selectQueryBuilder = new SelectQueryBuilder($this->driver);
+        $selectQueryBuilder->columns($columns);
 
-        return $this;
+        return $selectQueryBuilder;
     }
 
     public function insert(string $table): self
