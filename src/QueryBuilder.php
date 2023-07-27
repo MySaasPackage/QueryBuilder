@@ -6,7 +6,6 @@ namespace MySaasPackage\Support;
 
 use RuntimeException;
 use MySaasPackage\Support\QueryPart\Part;
-use MySaasPackage\Support\QueryPart\LimitPart;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\ValuesPart;
 use MySaasPackage\Support\QueryPart\HavingByPart;
@@ -14,6 +13,7 @@ use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
+use MySaasPackage\Support\QueryPart\Limit\LimitModule;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
@@ -28,6 +28,7 @@ class QueryBuilder implements Part
     use OrderByModule;
     use ColumnsModule;
     use GroupByModule;
+    use LimitModule;
     use CommonTableExpressionModule;
 
     protected array $parts = [];
@@ -154,13 +155,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function limit(int $limit, int $offset = null): self
-    {
-        $this->parts[LimitPart::class] = new LimitPart($this->drive, $limit, $offset);
-
-        return $this;
-    }
-
     public function having(string $condition): self
     {
         $this->parts[HavingByPart::class] = new HavingByPart($condition);
@@ -223,9 +217,8 @@ class QueryBuilder implements Part
             $sql = "{$sql} {$harving}";
         }
 
-        if (isset($this->parts[LimitPart::class])) {
-            $limit = $this->parts[LimitPart::class]->__toString();
-            $sql = "{$sql} {$limit}";
+        if ($this->limitPart) {
+            $sql = "{$sql} {$this->__toLimit()}";
         }
 
         if (isset($this->parts[ReturningPart::class])) {

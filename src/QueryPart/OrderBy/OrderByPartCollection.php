@@ -8,27 +8,24 @@ use MySaasPackage\Support\QueryPart\Part;
 
 class OrderByPartCollection implements Part
 {
-    public function __construct(
-        protected array $parts = []
-    ) {
-    }
+    protected array $orderByParts = [];
 
     public function add(OrderByPart $part): void
     {
-        $this->parts[] = $part;
+        $this->orderByParts[] = $part;
     }
 
     public function isNotEmpty(): bool
     {
-        return 0 !== count($this->parts);
+        return 0 !== count($this->orderByParts);
     }
 
     public function __toString(): string
     {
-        if (0 === count($this->parts)) {
+        if (0 === count($this->orderByParts)) {
             return '';
         }
 
-        return 'ORDER BY ' . implode(' ', $this->parts);
+        return 'ORDER BY ' . implode(' ', $this->orderByParts);
     }
 }
