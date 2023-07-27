@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Set;
 
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 
-class SetPart implements Part
+class SetPart implements QueryPart
 {
     public function __construct(
         public readonly array $values,

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Where;
 
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 
-class WherePart implements Part
+class WherePart implements QueryPart
 {
     public function __construct(
         public readonly string $condition,

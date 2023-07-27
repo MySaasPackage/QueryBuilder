@@ -11,7 +11,7 @@ use MySaasPackage\Support\QueryPart\Parameter\ParameterModule;
 use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
 use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
 
-class DeleteQueryBuilder implements Part
+class DeleteQueryBuilder implements QueryBuilder
 {
     use WhereTrait;
     use ReturningModule;

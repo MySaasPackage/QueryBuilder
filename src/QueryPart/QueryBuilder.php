@@ -6,6 +6,6 @@ namespace MySaasPackage\Support\QueryPart;
 
 use Stringable;
 
-interface Part extends Stringable
+interface QueryBuilder extends Stringable
 {
 }

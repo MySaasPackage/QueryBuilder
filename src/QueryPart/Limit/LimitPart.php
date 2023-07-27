@@ -6,10 +6,10 @@ namespace MySaasPackage\Support\QueryPart\Limit;
 
 use InvalidArgumentException;
 use MySaasPackage\Support\DbDriver;
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 use MySaasPackage\Support\QueryPart\DrivablePart;
 
-class LimitPart implements Part, DrivablePart
+class LimitPart implements QueryPart, DrivablePart
 {
     public function __construct(
         public readonly DbDriver $driver,

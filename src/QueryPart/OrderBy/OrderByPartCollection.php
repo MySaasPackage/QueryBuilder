@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\OrderBy;
 
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 
-class OrderByPartCollection implements Part
+class OrderByPartCollection implements QueryPart
 {
     protected array $orderByParts = [];
 

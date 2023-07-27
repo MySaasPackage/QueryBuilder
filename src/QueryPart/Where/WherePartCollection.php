@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Where;
 
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 
-class WherePartCollection implements Part
+class WherePartCollection implements QueryPart
 {
     public function __construct(
         protected array $parts = []

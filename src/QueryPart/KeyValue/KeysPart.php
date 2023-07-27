@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\KeyValue;
 
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 
-class KeysPart implements Part
+class KeysPart implements QueryPart
 {
     public function __construct(
         public readonly array $columns,

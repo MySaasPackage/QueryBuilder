@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\Table;
 
 use InvalidArgumentException;
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 
-class TablePart implements Part
+class TablePart implements QueryPart
 {
     public const TABLE_PATTERN = '/^[a-z_.]+$/';
 

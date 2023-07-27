@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Columns;
 
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 use MySaasPackage\Support\QueryPart\StringablePart;
 
-class ColumnsPart implements Part
+class ColumnsPart implements QueryPart
 {
     public array $columns = [];
 

@@ -12,7 +12,7 @@ use MySaasPackage\Support\QueryPart\Table\TableModule;
 use MySaasPackage\Support\QueryPart\Parameter\ParameterModule;
 use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
 
-class UpdateQueryBuilder implements Part
+class UpdateQueryBuilder implements QueryBuilder
 {
     use WhereTrait;
     use JoinModule;

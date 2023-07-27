@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\CommonTableExpression;
 
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 
-class CommonTableExpressionPartCollection implements Part
+class CommonTableExpressionPartCollection implements QueryPart
 {
     public function __construct(
         public array $ctes = []

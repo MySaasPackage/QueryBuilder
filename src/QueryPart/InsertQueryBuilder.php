@@ -11,7 +11,7 @@ use MySaasPackage\Support\QueryPart\KeyValue\KeyValueModule;
 use MySaasPackage\Support\QueryPart\Parameter\ParameterModule;
 use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
 
-class InsertQueryBuilder implements Part
+class InsertQueryBuilder implements QueryBuilder
 {
     use WhereTrait;
     use ReturningModule;

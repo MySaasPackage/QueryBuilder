@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\Parameter;
 
 use MySaasPackage\Support\QueryBuilder;
-use MySaasPackage\Support\QueryPart\Part;
+use MySaasPackage\Support\QueryPart\QueryPart;
 
-class ParameterPart implements Part
+class ParameterPart implements QueryPart
 {
     public readonly mixed $value;
 
@@ -24,7 +24,7 @@ class ParameterPart implements Part
             return sprintf('(%s)', $value->__toString());
         }
 
-        if ($value instanceof Part) {
+        if ($value instanceof QueryPart) {
             return $value->__toString();
         }
 
