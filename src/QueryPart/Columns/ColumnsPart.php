@@ -24,8 +24,6 @@ class ColumnsPart implements QueryPart
             return '*';
         }
 
-        $columns = array_map(fn ($column) => strval($column), $this->columns);
-
-        return implode(', ', $columns);
+        return implode(', ', $this->columns);
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Parameter;
 
+use MySaasPackage\Support\QueryPart\StringablePart;
+
 trait ParameterModule
 {
     protected ParameterPartCollection|null $parameterPartCollection = null;
@@ -16,9 +18,9 @@ trait ParameterModule
         return $this;
     }
 
-    public function setParameter(string|int $key, $value): self
+    public function setParameter(string|int $key, mixed $value): self
     {
-        $this->addParam(new ParameterPart($key, $value));
+        $this->addParam(new ParameterPart($key, new StringablePart($value)));
 
         return $this;
     }
@@ -29,19 +31,12 @@ trait ParameterModule
             return $sql;
         }
 
-        $params = $this->parameterPartCollection->params;
-
         $patterns = [];
         $replacements = [];
 
-        foreach ($params as $param) {
-            if (is_int($param->key)) {
-                $patterns[] = '/\?/';
-            } else {
-                $patterns[] = sprintf('/:%s/', $param->key);
-            }
-
-            $replacements[] = strval($param->value);
+        foreach ($this->parameterPartCollection->params as $param) {
+            $patterns[] = is_int($param->key) ? '/\?/' : sprintf('/:%s/', $param->key);
+            $replacements[] = sprintf('\'%s\'', $param->value);
         }
 
         return preg_replace($patterns, $replacements, $sql, 1);
