@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\Support\QueryPart\Returning;
+
+use MySaasPackage\Support\QueryPart\Columns\ColumnsPart;
 
 class ReturningPart extends ColumnsPart
 {

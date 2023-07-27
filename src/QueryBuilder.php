@@ -19,6 +19,7 @@ use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
 use MySaasPackage\Support\QueryPart\HavingBy\HavingByModule;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
+use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
 use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
 
 class QueryBuilder implements Part
@@ -30,6 +31,7 @@ class QueryBuilder implements Part
     use GroupByModule;
     use LimitModule;
     use HavingByModule;
+    use ReturningModule;
     use CommonTableExpressionModule;
 
     protected array $parts = [];
@@ -149,13 +151,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function returning(array $columns = []): self
-    {
-        $this->parts[ReturningPart::class] = new ReturningPart($columns);
-
-        return $this;
-    }
-
     protected function bindParameterParts(string $sql): string
     {
         if (!isset($this->parts[ParameterPartCollection::class])) {
@@ -214,9 +209,8 @@ class QueryBuilder implements Part
             $sql = "{$sql} {$this->__toLimit()}";
         }
 
-        if (isset($this->parts[ReturningPart::class])) {
-            $returning = $this->parts[ReturningPart::class]->__toString();
-            $sql = "{$sql} {$returning}";
+        if ($this->returningPart) {
+            $sql = "{$sql} {$this->__toReturning()}";
         }
 
         return $sql;
