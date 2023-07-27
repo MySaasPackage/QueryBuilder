@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\OrderBy;
 
-use MySaasPackage\Support\QueryPart\ColumnPart;
+use MySaasPackage\Support\QueryPart\Columns\ColumnPart;
 
 trait OrderByTrait
 {

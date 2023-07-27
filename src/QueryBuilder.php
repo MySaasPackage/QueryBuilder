@@ -9,15 +9,16 @@ use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\LimitPart;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\ValuesPart;
-use MySaasPackage\Support\QueryPart\ColumnsPart;
 use MySaasPackage\Support\QueryPart\GroupByPart;
 use MySaasPackage\Support\QueryPart\HavingByPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
 use MySaasPackage\Support\QueryPart\Join\JoinTrait;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
+use MySaasPackage\Support\QueryPart\Columns\ColumnsPart;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
 use MySaasPackage\Support\QueryPart\OrderBy\OrderByTrait;
+use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
 use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionTrait;
 
@@ -26,6 +27,7 @@ class QueryBuilder implements Part
     use WhereTrait;
     use JoinTrait;
     use OrderByTrait;
+    use ColumnsModule;
     use CommonTableExpressionTrait;
 
     protected array $parts = [];
@@ -58,7 +60,7 @@ class QueryBuilder implements Part
     public function select(array $columns = ['*']): self
     {
         $this->parts[self::TYPE] = self::SELECT;
-        $this->parts[ColumnsPart::class] = ColumnsPart::fromRawArray($columns);
+        $this->columns($columns);
 
         return $this;
     }
@@ -84,7 +86,7 @@ class QueryBuilder implements Part
             throw new RuntimeException('You can only use values() with insert()');
         }
 
-        $this->parts[ColumnsPart::class] = ColumnsPart::fromRawArray(array_keys($values));
+        $this->columns(array_keys($values));
         $this->parts[ValuesPart::class] = new ValuesPart(array_values($values));
 
         return $this;
@@ -200,9 +202,8 @@ class QueryBuilder implements Part
     public function __toSelect(): string
     {
         $table = $this->parts[TablePart::class]->__toString();
-        $columns = $this->parts[ColumnsPart::class]->__toString();
 
-        $sql = "SELECT {$columns} FROM {$table}";
+        $sql = "SELECT {$this->__toColumns()} FROM {$table}";
 
         if ($this->commonTableExpressionPartCollection) {
             $sql = "{$this->__toCommonTableExpression()} {$sql}";
@@ -249,7 +250,7 @@ class QueryBuilder implements Part
         $columns = $this->parts[ColumnsPart::class]->__toString();
         $values = $this->parts[ValuesPart::class]->__toString();
 
-        $sql = "INSERT INTO {$table} ({$columns}) {$values}";
+        $sql = "INSERT INTO {$table} ({$this->__toColumns()}) {$values}";
 
         if (isset($this->parts[ReturningPart::class])) {
             $returning = $this->parts[ReturningPart::class]->__toString();
