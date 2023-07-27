@@ -15,6 +15,10 @@ class KeysPart implements Stringable
 
     public function __toString(): string
     {
-        return '(' . implode(', ', array_map(fn ($column) => strval($column), $this->columns)) . ')';
+        if (0 === count($this->columns)) {
+            return '';
+        }
+
+        return '(' . implode(', ', $this->columns) . ')';
     }
 }

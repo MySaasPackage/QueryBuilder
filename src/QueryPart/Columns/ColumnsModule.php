@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MySaasPackage\Support\QueryPart\Columns;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\StringablePart;
 
 trait ColumnsModule
 {
@@ -17,7 +16,7 @@ trait ColumnsModule
         $this->columns->add($column);
     }
 
-    public function columns(array $columns = ['*']): self
+    public function columns(array $columns = []): self
     {
         foreach ($columns as $column) {
             $this->addColumnToCollection($column);
@@ -26,9 +25,9 @@ trait ColumnsModule
         return $this;
     }
 
-    public function addCollumn(string $column): self
+    public function addCollumn(Stringable|string $column): self
     {
-        $this->addColumnToCollection(new StringablePart($column));
+        $this->addColumnToCollection($column);
 
         return $this;
     }

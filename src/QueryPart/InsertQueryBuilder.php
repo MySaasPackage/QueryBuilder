@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart;
 
+use Stringable;
 use MySaasPackage\Support\QueryPart\Table\TableModule;
 use MySaasPackage\Support\QueryPart\Where\WhereModule;
 use MySaasPackage\Support\QueryPart\KeyValue\KeyValueModule;
@@ -22,7 +23,7 @@ class InsertQueryBuilder implements QueryBuilder
     {
     }
 
-    public function into(string $table): static
+    public function into(Stringable|string $table): static
     {
         $this->table($table);
 
