@@ -9,26 +9,26 @@ use MySaasPackage\Support\QueryPart\Part;
 use MySaasPackage\Support\QueryPart\LimitPart;
 use MySaasPackage\Support\QueryPart\TablePart;
 use MySaasPackage\Support\QueryPart\ValuesPart;
-use MySaasPackage\Support\QueryPart\GroupByPart;
 use MySaasPackage\Support\QueryPart\HavingByPart;
 use MySaasPackage\Support\QueryPart\ParameterPart;
 use MySaasPackage\Support\QueryPart\ReturningPart;
 use MySaasPackage\Support\QueryPart\Join\JoinModule;
 use MySaasPackage\Support\QueryPart\Where\WhereTrait;
-use MySaasPackage\Support\QueryPart\Columns\ColumnsPart;
 use MySaasPackage\Support\QueryPart\UpdateSetValuesPart;
-use MySaasPackage\Support\QueryPart\OrderBy\OrderByTrait;
 use MySaasPackage\Support\QueryPart\Columns\ColumnsModule;
+use MySaasPackage\Support\QueryPart\GroupBy\GroupByModule;
+use MySaasPackage\Support\QueryPart\OrderBy\OrderByModule;
 use MySaasPackage\Support\QueryPart\ParameterPartCollection;
-use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionTrait;
+use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
 
 class QueryBuilder implements Part
 {
     use WhereTrait;
     use JoinModule;
-    use OrderByTrait;
+    use OrderByModule;
     use ColumnsModule;
-    use CommonTableExpressionTrait;
+    use GroupByModule;
+    use CommonTableExpressionModule;
 
     protected array $parts = [];
 
@@ -154,13 +154,6 @@ class QueryBuilder implements Part
         return $this;
     }
 
-    public function groupBy($columns): self
-    {
-        $this->parts[GroupByPart::class] = new GroupByPart($columns);
-
-        return $this;
-    }
-
     public function limit(int $limit, int $offset = null): self
     {
         $this->parts[LimitPart::class] = new LimitPart($this->drive, $limit, $offset);
@@ -221,9 +214,8 @@ class QueryBuilder implements Part
             $sql = "{$sql} {$this->__toOrderBy()}";
         }
 
-        if (isset($this->parts[GroupByPart::class])) {
-            $groupBy = $this->parts[GroupByPart::class]->__toString();
-            $sql = "{$sql} {$groupBy}";
+        if ($this->groupByPartCollection) {
+            $sql = "{$sql} {$this->__toGroupBySql()}";
         }
 
         if (isset($this->parts[HavingByPart::class])) {
@@ -247,7 +239,6 @@ class QueryBuilder implements Part
     public function __toInsert(): string
     {
         $table = $this->parts[TablePart::class]->__toString();
-        $columns = $this->parts[ColumnsPart::class]->__toString();
         $values = $this->parts[ValuesPart::class]->__toString();
 
         $sql = "INSERT INTO {$table} ({$this->__toColumns()}) {$values}";

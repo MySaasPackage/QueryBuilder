@@ -10,7 +10,7 @@ trait ColumnsModule
 {
     protected ColumnsPart|null $columns = null;
 
-    protected function addColumn(StringablePart $column): void
+    protected function addColumnToCollection(StringablePart $column): void
     {
         $this->columns ??= new ColumnsPart();
         $this->columns->add($column);
@@ -19,8 +19,15 @@ trait ColumnsModule
     public function columns(array $columns = ['*']): self
     {
         foreach ($columns as $column) {
-            $this->addColumn(new StringablePart($column));
+            $this->addColumnToCollection(new StringablePart($column));
         }
+
+        return $this;
+    }
+
+    public function addCollumn(string $column): self
+    {
+        $this->addColumnToCollection(new StringablePart($column));
 
         return $this;
     }

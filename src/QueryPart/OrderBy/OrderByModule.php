@@ -6,11 +6,11 @@ namespace MySaasPackage\Support\QueryPart\OrderBy;
 
 use MySaasPackage\Support\QueryPart\StringablePart;
 
-trait OrderByTrait
+trait OrderByModule
 {
     protected OrderByPartCollection|null $orderByPartCollection = null;
 
-    protected function addOrderBy(OrderByPart $orderBy): self
+    protected function addOrderByPartToCollection(OrderByPart $orderBy): self
     {
         $this->orderByPartCollection ??= new OrderByPartCollection();
         $this->orderByPartCollection->add($orderBy);
@@ -20,12 +20,19 @@ trait OrderByTrait
 
     public function orderBy(string $column, string $direction = 'ASC'): self
     {
-        $this->addOrderBy(new OrderByPart(new StringablePart($column), $direction));
+        $this->addOrderByPartToCollection(new OrderByPart(new StringablePart($column), $direction));
 
         return $this;
     }
 
-    public function __toOrderBy(): string
+    public function addOrderBy(string $column, string $direction = 'ASC'): self
+    {
+        $this->addOrderByPartToCollection(new OrderByPart(new StringablePart($column), $direction));
+
+        return $this;
+    }
+
+    protected function __toOrderBy(): string
     {
         return $this->orderByPartCollection?->__toString();
     }

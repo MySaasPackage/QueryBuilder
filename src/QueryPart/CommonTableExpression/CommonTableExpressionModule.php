@@ -6,11 +6,11 @@ namespace MySaasPackage\Support\QueryPart\CommonTableExpression;
 
 use MySaasPackage\Support\QueryBuilder;
 
-trait CommonTableExpressionTrait
+trait CommonTableExpressionModule
 {
     protected CommonTableExpressionPartCollection|null $commonTableExpressionPartCollection = null;
 
-    protected function addCte(CommonTableExpressionPart $cte): self
+    protected function addCommonTableExpressionToCollection(CommonTableExpressionPart $cte): self
     {
         $this->commonTableExpressionPartCollection ??= new CommonTableExpressionPartCollection();
         $this->commonTableExpressionPartCollection->add($cte);
@@ -20,12 +20,12 @@ trait CommonTableExpressionTrait
 
     public function with(string $alias, QueryBuilder $query): self
     {
-        $this->addCte(new CommonTableExpressionPart(alias: $alias, query: $query));
+        $this->addCommonTableExpressionToCollection(new CommonTableExpressionPart(alias: $alias, query: $query));
 
         return $this;
     }
 
-    public function __toCommonTableExpression(): string
+    protected function __toCommonTableExpression(): string
     {
         return $this->joinPartCollection->__toString();
     }
