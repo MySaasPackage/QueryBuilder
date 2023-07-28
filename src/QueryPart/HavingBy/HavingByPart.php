@@ -15,6 +15,6 @@ class HavingByPart implements Stringable
 
     public function __toString(): string
     {
-        return 'HAVING ' . strval($this->condition);
+        return 'HAVING ' . $this->condition;
     }
 }

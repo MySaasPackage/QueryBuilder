@@ -19,7 +19,7 @@ class StringablePart implements Stringable
             return sprintf('(%s)', $value->__toString());
         }
 
-        return strval($value);
+        return $value;
     }
 
     public function __toString(): string

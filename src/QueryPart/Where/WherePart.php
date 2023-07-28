@@ -16,7 +16,7 @@ class WherePart implements Stringable
 
     public function __toString(): string
     {
-        $sanitizedConditional = preg_replace('/"/', '\'', strval($this->condition));
+        $sanitizedConditional = preg_replace('/"/', '\'', $this->condition);
 
         if (null === $this->type) {
             return $sanitizedConditional;

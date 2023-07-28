@@ -17,9 +17,9 @@ class TablePart implements Stringable
     public function __toString()
     {
         if ($this->alias) {
-            return sprintf('%s AS %s', strval($this->table), $this->alias);
+            return sprintf('%s AS %s', $this->table, $this->alias);
         }
 
-        return sprintf('%s', strval($this->table));
+        return sprintf('%s', $this->table);
     }
 }
