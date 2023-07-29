@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support;
 
+use Stringable;
 use MySaasPackage\Support\QueryPart\DbDriver;
 use MySaasPackage\Support\QueryPart\DeleteQueryBuilder;
 use MySaasPackage\Support\QueryPart\InsertQueryBuilder;
 use MySaasPackage\Support\QueryPart\SelectQueryBuilder;
 use MySaasPackage\Support\QueryPart\UpdateQueryBuilder;
-use MySaasPackage\Support\QueryPart\QueryBuilder as QueryBuilderContract;
+use MySaasPackage\Support\QueryPart\QueryBuilder as QueryBuilderImpl;
 
 class QueryBuilder
 {
@@ -29,7 +30,7 @@ class QueryBuilder
         return new self(DbDriver::MySQL);
     }
 
-    public function with(string $alias, QueryBuilderContract $query): self
+    public function with(string $alias, QueryBuilderImpl|Stringable|string $query): self
     {
         $this->commonTableExpressionPartCollection[] = [$alias, $query];
 
@@ -53,6 +54,10 @@ class QueryBuilder
         $queryBuilder = new InsertQueryBuilder($this->driver);
         $queryBuilder->into($table);
 
+        foreach ($this->commonTableExpressionPartCollection as [$alias, $expression]) {
+            $queryBuilder->with($alias, $expression);
+        }
+
         return $queryBuilder;
     }
 
@@ -61,6 +66,10 @@ class QueryBuilder
         $queryBuilder = new UpdateQueryBuilder($this->driver);
         $queryBuilder->table($table);
 
+        foreach ($this->commonTableExpressionPartCollection as [$alias, $expression]) {
+            $queryBuilder->with($alias, $expression);
+        }
+
         return $queryBuilder;
     }
 
@@ -68,6 +77,10 @@ class QueryBuilder
     {
         $queryBuilder = new DeleteQueryBuilder($this->driver);
         $queryBuilder->from($table);
+
+        foreach ($this->commonTableExpressionPartCollection as [$alias, $expression]) {
+            $queryBuilder->with($alias, $expression);
+        }
 
         return $queryBuilder;
     }

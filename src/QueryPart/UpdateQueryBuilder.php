@@ -10,6 +10,7 @@ use MySaasPackage\Support\QueryPart\Table\TableModule;
 use MySaasPackage\Support\QueryPart\Where\WhereModule;
 use MySaasPackage\Support\QueryPart\Parameter\ParameterModule;
 use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
+use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
 
 class UpdateQueryBuilder implements QueryBuilder
 {
@@ -19,6 +20,7 @@ class UpdateQueryBuilder implements QueryBuilder
     use SetModule;
     use TableModule;
     use ParameterModule;
+    use CommonTableExpressionModule;
 
     public function __construct(protected DbDriver $driver)
     {
@@ -27,6 +29,10 @@ class UpdateQueryBuilder implements QueryBuilder
     public function __toString(): string
     {
         $sql = "UPDATE {$this->__toTable()} {$this->__toSet()}";
+
+        if ($this->commonTableExpressionPartCollection) {
+            $sql = "{$this->__toCommonTableExpression()} {$sql}";
+        }
 
         if ($this->wherePartsCollection) {
             $sql = "{$sql} {$this->__toWhere()}";

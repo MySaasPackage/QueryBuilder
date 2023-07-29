@@ -10,6 +10,7 @@ use MySaasPackage\Support\QueryPart\Where\WhereModule;
 use MySaasPackage\Support\QueryPart\KeyValue\KeyValueModule;
 use MySaasPackage\Support\QueryPart\Parameter\ParameterModule;
 use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
+use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
 
 class InsertQueryBuilder implements QueryBuilder
 {
@@ -18,6 +19,7 @@ class InsertQueryBuilder implements QueryBuilder
     use TableModule;
     use KeyValueModule;
     use ParameterModule;
+    use CommonTableExpressionModule;
 
     public function __construct(protected DbDriver $driver)
     {
@@ -33,6 +35,10 @@ class InsertQueryBuilder implements QueryBuilder
     public function __toString(): string
     {
         $sql = "INSERT INTO {$this->__toTable()} {$this->__toKeys()} {$this->__toValues()}";
+
+        if ($this->commonTableExpressionPartCollection) {
+            $sql = "{$this->__toCommonTableExpression()} {$sql}";
+        }
 
         if ($this->wherePartsCollection) {
             $sql = "{$sql} {$this->__toWhere()}";

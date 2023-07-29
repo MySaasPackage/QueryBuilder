@@ -11,12 +11,12 @@ class CommonTableExpressionPart implements Stringable
 {
     public function __construct(
         public readonly string $alias,
-        public readonly QueryBuilder $query
+        public readonly QueryBuilder|Stringable|string $query
     ) {
     }
 
     public function __toString()
     {
-        return sprintf('%s AS (%s)', $this->alias, $this->query->__toString());
+        return sprintf('%s AS (%s)', $this->alias, $this->query);
     }
 }

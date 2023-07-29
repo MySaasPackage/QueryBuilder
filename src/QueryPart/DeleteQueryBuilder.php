@@ -26,6 +26,10 @@ class DeleteQueryBuilder implements QueryBuilder
     {
         $sql = "DELETE FROM {$this->__toTable()}";
 
+        if ($this->commonTableExpressionPartCollection) {
+            $sql = "{$this->__toCommonTableExpression()} {$sql}";
+        }
+
         if ($this->wherePartsCollection) {
             $sql = "{$sql} {$this->__toWhere()}";
         }
