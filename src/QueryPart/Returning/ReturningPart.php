@@ -4,12 +4,25 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\Returning;
 
-use MySaasPackage\Support\QueryPart\Columns\ColumnsPart;
+use Stringable;
 
-class ReturningPart extends ColumnsPart
+class ReturningPart implements Stringable
 {
+    public array $returning = [];
+
+    public function add(Stringable|string $column): self
+    {
+        $this->returning[] = $column;
+
+        return $this;
+    }
+
     public function __toString(): string
     {
-        return 'RETURNING ' . parent::__toString();
+        if (0 === count($this->returning)) {
+            return '*';
+        }
+
+        return 'RETURNING ' . implode(', ', $this->returning);
     }
 }
