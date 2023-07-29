@@ -19,7 +19,7 @@ trait ReturningModule
     public function returning(array $columns = []): static
     {
         foreach ($columns as $column) {
-            $this->addColumnToCollection($column);
+            $this->addReturningToCollection($column);
         }
 
         return $this;
