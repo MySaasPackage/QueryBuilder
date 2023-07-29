@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\KeyValue;
 
-use MySaasPackage\Support\QueryPart\StringablePart;
+use MySaasPackage\Support\QueryPart\Stringify;
 
 trait KeyValueModule
 {
@@ -13,8 +13,8 @@ trait KeyValueModule
 
     public function values(array $values = []): static
     {
-        $this->keysPart = new KeysPart(array_map(fn ($value) => new StringablePart($value), array_keys($values)));
-        $this->valuesPart = new ValuesPart(array_map(fn ($value) => new StringablePart($value), array_values($values)));
+        $this->keysPart = new KeysPart(array_map(fn ($value) => Stringify::stringify($value), array_keys($values)));
+        $this->valuesPart = new ValuesPart(array_map(fn ($value) => Stringify::stringify($value), array_values($values)));
 
         return $this;
     }

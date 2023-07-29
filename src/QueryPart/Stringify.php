@@ -6,14 +6,19 @@ namespace MySaasPackage\Support\QueryPart;
 
 use Stringable;
 
-class StringablePart implements Stringable
+class Stringify implements Stringable
 {
     public function __construct(
-        public readonly QueryBuilder|Stringable|string $value,
+        public readonly mixed $value,
     ) {
     }
 
-    public function stringify(mixed $value): string
+    public static function create(mixed $value): self
+    {
+        return new self($value);
+    }
+
+    public static function stringify(mixed $value): string
     {
         if ($value instanceof QueryBuilder) {
             return sprintf('(%s)', $value->__toString());
@@ -23,11 +28,11 @@ class StringablePart implements Stringable
             return $value->__toString();
         }
 
-        return $value;
+        return strval($value);
     }
 
     public function __toString(): string
     {
-        return $this->stringify($this->value);
+        return self::stringify($this->value);
     }
 }

@@ -13,6 +13,7 @@ trait ColumnsModule
     protected function addColumnToCollection(Stringable|string $column): void
     {
         $this->columns ??= new ColumnsPart();
+
         $this->columns->add($column);
     }
 
