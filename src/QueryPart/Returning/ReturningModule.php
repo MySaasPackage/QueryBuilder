@@ -12,8 +12,8 @@ trait ReturningModule
 
     protected function addReturningToCollection(Stringable|string $column): void
     {
-        $this->columns ??= new ReturningPart();
-        $this->columns->add($column);
+        $this->returningPart ??= new ReturningPart();
+        $this->returningPart->add($column);
     }
 
     public function returning(array $columns = []): static
