@@ -9,7 +9,7 @@ use Stringable;
 class StringablePart implements Stringable
 {
     public function __construct(
-        public readonly mixed $value,
+        public readonly QueryBuilder|Stringable|string $value,
     ) {
     }
 
@@ -17,6 +17,10 @@ class StringablePart implements Stringable
     {
         if ($value instanceof QueryBuilder) {
             return sprintf('(%s)', $value->__toString());
+        }
+
+        if ($value instanceof Stringable) {
+            return $value->__toString();
         }
 
         return $value;

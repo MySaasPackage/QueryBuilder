@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MySaasPackage\Support\QueryPart\KeyValue;
 
+use MySaasPackage\Support\QueryPart\StringablePart;
+
 trait KeyValueModule
 {
     protected ValuesPart|null $valuesPart = null;
@@ -11,8 +13,8 @@ trait KeyValueModule
 
     public function values(array $values = []): static
     {
-        $this->keysPart = new KeysPart(array_keys($values));
-        $this->valuesPart = new ValuesPart(array_values($values));
+        $this->keysPart = new KeysPart(array_map(fn ($value) => new StringablePart($value), array_keys($values)));
+        $this->valuesPart = new ValuesPart(array_map(fn ($value) => new StringablePart($value), array_values($values)));
 
         return $this;
     }
