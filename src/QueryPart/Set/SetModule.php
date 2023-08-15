@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Set;
+namespace MySaasPackage\QueryPart\Set;
 
 trait SetModule
 {

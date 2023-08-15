@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Where;
+namespace MySaasPackage\QueryPart\Where;
 
 enum Where: string
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Table;
+namespace MySaasPackage\QueryPart\Table;
 
 use Stringable;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Returning;
+namespace MySaasPackage\QueryPart\Returning;
 
 use Stringable;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support;
+namespace MySaasPackage;
 
 use PHPUnit\Framework\TestCase;
 

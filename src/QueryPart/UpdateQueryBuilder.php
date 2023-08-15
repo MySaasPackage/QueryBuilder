@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\QueryPart;
 
-use MySaasPackage\Support\QueryPart\Set\SetModule;
-use MySaasPackage\Support\QueryPart\Join\JoinModule;
-use MySaasPackage\Support\QueryPart\Table\TableModule;
-use MySaasPackage\Support\QueryPart\Where\WhereModule;
-use MySaasPackage\Support\QueryPart\Parameter\ParameterModule;
-use MySaasPackage\Support\QueryPart\Returning\ReturningModule;
-use MySaasPackage\Support\QueryPart\CommonTableExpression\CommonTableExpressionModule;
+use Stringable;
+use MySaasPackage\QueryPart\Set\SetModule;
+use MySaasPackage\QueryPart\Join\JoinModule;
+use MySaasPackage\QueryPart\Table\TableModule;
+use MySaasPackage\QueryPart\Where\WhereModule;
+use MySaasPackage\QueryPart\Parameter\ParameterModule;
+use MySaasPackage\QueryPart\Returning\ReturningModule;
+use MySaasPackage\QueryPart\CommonTableExpression\CommonTableExpressionModule;
 
-class UpdateQueryBuilder implements QueryBuilder
+class UpdateQueryBuilder implements Stringable
 {
     use WhereModule;
     use JoinModule;

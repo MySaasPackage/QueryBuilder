@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Join;
+namespace MySaasPackage\QueryPart\Join;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\Table\TablePart;
+use MySaasPackage\QueryPart\Table\TablePart;
 
 class JoinPart implements Stringable
 {

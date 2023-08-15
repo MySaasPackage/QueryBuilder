@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\CommonTableExpression;
+namespace MySaasPackage\QueryPart\CommonTableExpression;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\QueryBuilder;
+use MySaasPackage\QueryPart\Stringify;
 
 class CommonTableExpressionPart implements Stringable
 {
     public function __construct(
         public readonly string $alias,
-        public readonly QueryBuilder|Stringable|string $query
+        public readonly Stringable|string $query
     ) {
     }
 
     public function __toString()
     {
-        return sprintf('%s AS (%s)', $this->alias, $this->query);
+        return sprintf('%s AS %s', $this->alias, Stringify::stringify($this->query));
     }
 }

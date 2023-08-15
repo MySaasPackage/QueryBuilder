@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Parameter;
+namespace MySaasPackage\QueryPart\Parameter;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\QueryBuilder;
+use MySaasPackage\QueryPart\Stringify;
+use MySaasPackage\QueryPart\SelectQueryBuilder;
 
 class ParameterPart implements Stringable
 {
@@ -36,8 +37,12 @@ class ParameterPart implements Stringable
 
     public function stringify(mixed $value): string
     {
-        if ($value instanceof QueryBuilder) {
-            return sprintf('(%s)', $value->__toString());
+        if ($value instanceof SelectQueryBuilder
+            || $value instanceof InsertQueryBuilder
+            || $value instanceof UpdateQueryBuilder
+            || $value instanceof DeleteQueryBuilder
+            || $value instanceof Stringify) {
+            return Stringify::stringify($value);
         }
 
         if (is_bool($value)) {

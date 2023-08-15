@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\OrderBy;
+namespace MySaasPackage\QueryPart\OrderBy;
 
 use Stringable;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Join;
+namespace MySaasPackage\QueryPart\Join;
 
 enum Join: string
 {

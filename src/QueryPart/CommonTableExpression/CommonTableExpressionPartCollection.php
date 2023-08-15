@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\CommonTableExpression;
+namespace MySaasPackage\QueryPart\CommonTableExpression;
 
 use Stringable;
 

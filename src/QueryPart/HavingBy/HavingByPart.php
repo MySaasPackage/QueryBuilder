@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\HavingBy;
+namespace MySaasPackage\QueryPart\HavingBy;
 
 use Stringable;
 

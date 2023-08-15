@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart;
+namespace MySaasPackage\QueryPart;
 
 use Stringable;
 
@@ -13,22 +13,16 @@ class Stringify implements Stringable
     ) {
     }
 
-    public static function create(mixed $value): self
-    {
-        return new self($value);
-    }
-
     public static function stringify(mixed $value): string
     {
-        if ($value instanceof QueryBuilder) {
-            return sprintf('(%s)', $value->__toString());
-        }
-
-        if ($value instanceof Stringable) {
-            return $value->__toString();
-        }
-
-        return strval($value);
+        return match (true) {
+            $value instanceof SelectQueryBuilder => sprintf('(%s)', $value->__toString()),
+            $value instanceof InsertQueryBuilder => sprintf('(%s)', $value->__toString()),
+            $value instanceof UpdateQueryBuilder => sprintf('(%s)', $value->__toString()),
+            $value instanceof DeleteQueryBuilder => sprintf('(%s)', $value->__toString()),
+            $value instanceof Stringable => $value->__toString(),
+            default => strval($value),
+        };
     }
 
     public function __toString(): string

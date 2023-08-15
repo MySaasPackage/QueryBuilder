@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support;
+namespace MySaasPackage;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\DbDriver;
-use MySaasPackage\Support\QueryPart\DeleteQueryBuilder;
-use MySaasPackage\Support\QueryPart\InsertQueryBuilder;
-use MySaasPackage\Support\QueryPart\SelectQueryBuilder;
-use MySaasPackage\Support\QueryPart\UpdateQueryBuilder;
-use MySaasPackage\Support\QueryPart\QueryBuilder as QueryBuilderImpl;
+use MySaasPackage\QueryPart\DbDriver;
+use MySaasPackage\QueryPart\DeleteQueryBuilder;
+use MySaasPackage\QueryPart\InsertQueryBuilder;
+use MySaasPackage\QueryPart\SelectQueryBuilder;
+use MySaasPackage\QueryPart\UpdateQueryBuilder;
 
 class QueryBuilder
 {
@@ -30,7 +29,7 @@ class QueryBuilder
         return new self(DbDriver::MySQL);
     }
 
-    public function with(string $alias, QueryBuilderImpl|Stringable|string $query): self
+    public function with(string $alias, Stringable|string $query): self
     {
         $this->commonTableExpressionPartCollection[] = [$alias, $query];
 

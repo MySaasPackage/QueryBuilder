@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\KeyValue;
+namespace MySaasPackage\QueryPart\KeyValue;
 
-use MySaasPackage\Support\QueryPart\Stringify;
+use MySaasPackage\QueryPart\Stringify;
 
 trait KeyValueModule
 {

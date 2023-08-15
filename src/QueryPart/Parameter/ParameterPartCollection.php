@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Parameter;
+namespace MySaasPackage\QueryPart\Parameter;
 
 use Stringable;
 

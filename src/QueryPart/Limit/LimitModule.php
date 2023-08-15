@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\Limit;
+namespace MySaasPackage\QueryPart\Limit;
 
 trait LimitModule
 {

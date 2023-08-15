@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MySaasPackage\Support\QueryPart\CommonTableExpression;
+namespace MySaasPackage\QueryPart\CommonTableExpression;
 
 use Stringable;
-use MySaasPackage\Support\QueryPart\QueryBuilder;
+use MySaasPackage\QueryPart\QueryBuilder;
 
 trait CommonTableExpressionModule
 {

@@ -6,11 +6,11 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "MySaasPackage\\Support\\": "src/"
+            "MySaasPackage\\": "src/"
         }
     },
     "autoload-dev": {
-        "psr-4": { "MySaasPackage\\Support\\": "tests/" }
+        "psr-4": { "MySaasPackage\\": "tests/" }
     },
     "authors": [
         {
