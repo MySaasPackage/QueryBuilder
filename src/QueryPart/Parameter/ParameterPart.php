@@ -6,7 +6,10 @@ namespace MySaasPackage\QueryPart\Parameter;
 
 use Stringable;
 use MySaasPackage\QueryPart\Stringify;
+use MySaasPackage\QueryPart\DeleteQueryBuilder;
+use MySaasPackage\QueryPart\InsertQueryBuilder;
 use MySaasPackage\QueryPart\SelectQueryBuilder;
+use MySaasPackage\QueryPart\UpdateQueryBuilder;
 
 class ParameterPart implements Stringable
 {
