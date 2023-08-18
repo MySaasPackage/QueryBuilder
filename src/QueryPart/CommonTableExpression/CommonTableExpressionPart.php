@@ -17,6 +17,6 @@ class CommonTableExpressionPart implements Stringable
 
     public function __toString()
     {
-        return sprintf('%s AS %s', $this->alias, Stringify::stringify($this->query));
+        return sprintf('%s AS %s', $this->alias, Stringify::parse($this->query));
     }
 }

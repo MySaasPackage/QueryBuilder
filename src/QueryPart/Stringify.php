@@ -13,7 +13,7 @@ class Stringify implements Stringable
     ) {
     }
 
-    public static function stringify(mixed $value): string
+    public static function parse(mixed $value): string
     {
         return match (true) {
             $value instanceof SelectQueryBuilder => sprintf('(%s)', $value->__toString()),
@@ -27,6 +27,6 @@ class Stringify implements Stringable
 
     public function __toString(): string
     {
-        return self::stringify($this->value);
+        return self::parse($this->value);
     }
 }

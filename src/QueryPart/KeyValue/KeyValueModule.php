@@ -13,8 +13,8 @@ trait KeyValueModule
 
     public function values(array $values = []): static
     {
-        $this->keysPart = new KeysPart(array_map(fn ($value) => Stringify::stringify($value), array_keys($values)));
-        $this->valuesPart = new ValuesPart(array_map(fn ($value) => Stringify::stringify($value), array_values($values)));
+        $this->keysPart = new KeysPart(array_map(fn ($value) => Stringify::parse($value), array_keys($values)));
+        $this->valuesPart = new ValuesPart(array_map(fn ($value) => Stringify::parse($value), array_values($values)));
 
         return $this;
     }

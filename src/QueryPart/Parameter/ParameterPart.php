@@ -45,7 +45,7 @@ class ParameterPart implements Stringable
             || $value instanceof UpdateQueryBuilder
             || $value instanceof DeleteQueryBuilder
             || $value instanceof Stringify) {
-            return Stringify::stringify($value);
+            return Stringify::parse($value);
         }
 
         if (is_bool($value)) {
