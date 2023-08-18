@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MySaasPackage\QueryPart\CommonTableExpression;
 
 use Stringable;
-use MySaasPackage\QueryPart\QueryBuilder;
 
 trait CommonTableExpressionModule
 {
@@ -19,7 +18,7 @@ trait CommonTableExpressionModule
         return $this;
     }
 
-    public function with(string $alias, QueryBuilder|Stringable|string $query): static
+    public function with(string $alias, Stringable|string $query): static
     {
         $this->addCommonTableExpressionToCollection(new CommonTableExpressionPart($alias, $query));
 

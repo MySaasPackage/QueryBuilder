@@ -2,12 +2,24 @@
 
 declare(strict_types=1);
 
-$value = '1.0';
+$strings = [
+    'SELECT * FROM table',
+    '   SELECT * FROM table',
+    'UPDATE table SE',
+    'INSERT into VALUE',
+    'DELETE FROM table',
+    'COUNT(SELECT * FROM table)',
+    'SELECT FROM (SELECT FROM)',
+    ' anything here (SELECT FROM)',
+];
 
-$isInteger = fn ($value) => is_int($value) || ctype_digit($value);
+$pattern = "/^(?:\s*)\b(SELECT|UPDATE|INSERT|DELETE)\b/i";
 
-if ($isInteger($value)) {
-    echo 'Integer';
-} else {
-    echo 'Not integer';
+foreach ($strings as $str) {
+    $pattern = "/^(?:\s*)\b(SELECT|UPDATE|INSERT|DELETE)\b/i";
+    if (preg_match($pattern, $str)) {
+        echo "\"$str\" matches the pattern\n";
+    } else {
+        echo "\"$str\" does not match the pattern\n";
+    }
 }

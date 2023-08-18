@@ -227,4 +227,55 @@ final class PostgreSQLQueryBuilderTest extends TestCase
 
         $this->assertEquals('DELETE FROM management.subscriptions WHERE uuid IN (\'69e5e669-910a-4e8c-9529-7142b1ae0655\', \'69e5e669-910a-4e8c-9529-7142b1ae0656\')', $query->__toString());
     }
+
+    public function testComplexQueryWithCTEs(): void
+    {
+        $insertTenantQuery = QueryBuilder::postgres()
+            ->insert('abraham.tenants')
+            ->values([
+                'schema' => ':tenant_schema',
+                'uuid' => ':tenant_uuid',
+            ])
+            ->returning(['*']);
+
+        $insertUserQuery = QueryBuilder::postgres()
+            ->insert('abraham.users')
+            ->values([
+                'uuid' => ':user_uuid',
+                'email' => ':user_email',
+                'phone' => ':user_phone',
+                'hash' => ':user_hash',
+                'tenant_id' => QueryBuilder::postgres()->select(['id'])->from('INSERTED_TENANT'),
+            ])
+            ->returning(['*']);
+
+        $updateTenantWithOwner = QueryBuilder::postgres()
+            ->update('abraham.tenants')
+            ->set(['user_owner_id' => QueryBuilder::postgres()->select(['id'])->from('INSERTED_USER')])
+            ->where('id = :tenant_id')
+            ->setParameter('tenant_id', QueryBuilder::postgres()->select(['id'])->from('INSERTED_TENANT'))
+            ->returning(['*']);
+
+        $selectUerTenantQuery = QueryBuilder::postgres()
+            ->with('INSERTED_TENANT', $insertTenantQuery)
+            ->with('INSERTED_USER', $insertUserQuery)
+            ->with('UPDATED_TENANT', $updateTenantWithOwner->__toString())
+            ->with('INSERTED_USER', $insertUserQuery)
+            ->select([
+                't.id AS tenant__id',
+                't.uuid AS tenant__uuid',
+                't.schema AS tenant__schema',
+                't.created_at AS tenant__created_at',
+                'u.id AS user__id',
+                'u.uuid AS user__uuid',
+                'u.email AS user__email',
+                'u.phone AS user__phone',
+                'u.hash AS user__hash',
+                'u.created_at AS user__created_at',
+            ])
+            ->from('INSERTED_USER AS u')
+            ->leftJoin('INSERTED_TENANT', 't', 't.id = u.tenant_id');
+
+        $this->assertEquals('WITH INSERTED_TENANT AS (INSERT INTO abraham.tenants (schema, uuid) VALUES (:tenant_schema, :tenant_uuid) RETURNING *), INSERTED_USER AS (INSERT INTO abraham.users (uuid, email, phone, hash, tenant_id) VALUES (:user_uuid, :user_email, :user_phone, :user_hash, (SELECT id FROM INSERTED_TENANT)) RETURNING *), UPDATED_TENANT AS (UPDATE abraham.tenants SET user_owner_id = (SELECT id FROM INSERTED_USER) WHERE id = (SELECT id FROM INSERTED_TENANT) RETURNING *), INSERTED_USER AS (INSERT INTO abraham.users (uuid, email, phone, hash, tenant_id) VALUES (:user_uuid, :user_email, :user_phone, :user_hash, (SELECT id FROM INSERTED_TENANT)) RETURNING *) SELECT t.id AS tenant__id, t.uuid AS tenant__uuid, t.schema AS tenant__schema, t.created_at AS tenant__created_at, u.id AS user__id, u.uuid AS user__uuid, u.email AS user__email, u.phone AS user__phone, u.hash AS user__hash, u.created_at AS user__created_at FROM INSERTED_USER AS u LEFT JOIN INSERTED_TENANT AS t ON t.id = u.tenant_id', $selectUerTenantQuery->__toString());
+    }
 }
