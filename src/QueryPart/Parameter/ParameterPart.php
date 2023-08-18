@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace MySaasPackage\QueryPart\Parameter;
 
 use Stringable;
-use MySaasPackage\QueryPart\Stringify;
-use MySaasPackage\QueryPart\DeleteQueryBuilder;
-use MySaasPackage\QueryPart\InsertQueryBuilder;
-use MySaasPackage\QueryPart\SelectQueryBuilder;
-use MySaasPackage\QueryPart\UpdateQueryBuilder;
+use MySaasPackage\QueryPart\StringifyPart;
 
 class ParameterPart implements Stringable
 {
@@ -40,12 +36,8 @@ class ParameterPart implements Stringable
 
     public function stringify(mixed $value): string
     {
-        if ($value instanceof SelectQueryBuilder
-            || $value instanceof InsertQueryBuilder
-            || $value instanceof UpdateQueryBuilder
-            || $value instanceof DeleteQueryBuilder
-            || $value instanceof Stringify) {
-            return Stringify::parse($value);
+        if (StringifyPart::isStringifyPart($value)) {
+            return StringifyPart::parse($value);
         }
 
         if (is_bool($value)) {

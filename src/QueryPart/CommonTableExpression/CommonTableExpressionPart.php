@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MySaasPackage\QueryPart\CommonTableExpression;
 
 use Stringable;
-use MySaasPackage\QueryPart\Stringify;
+use MySaasPackage\QueryPart\StringifyPart;
 
 class CommonTableExpressionPart implements Stringable
 {
@@ -17,6 +17,6 @@ class CommonTableExpressionPart implements Stringable
 
     public function __toString()
     {
-        return sprintf('%s AS %s', $this->alias, Stringify::parse($this->query));
+        return sprintf('%s AS %s', $this->alias, StringifyPart::parse($this->query));
     }
 }
