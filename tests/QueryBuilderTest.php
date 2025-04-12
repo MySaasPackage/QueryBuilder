@@ -8,31 +8,9 @@ use PHPUnit\Framework\TestCase;
 
 class QueryBuilderTest extends TestCase
 {
-    private QueryBuilder $queryBuilder;
-
-    protected function setUp(): void
-    {
-        $this->queryBuilder = new QueryBuilder('users');
-    }
-
     private function normalizeSQL(string $sql): string
     {
-        // Remove all whitespace (spaces, newlines, tabs)
-        $sql = preg_replace('/\s+/', ' ', trim($sql));
-
-        // Convert to lowercase
-        $sql = strtolower($sql);
-
-        // Remove spaces around common SQL punctuation
-        $sql = preg_replace('/\s*(,|\(|\))\s*/', '$1', $sql);
-
-        // Ensure single space after keywords
-        $keywords = ['select', 'from', 'where', 'and', 'or', 'union all', 'group by', 'order by', 'having'];
-        foreach ($keywords as $keyword) {
-            $sql = preg_replace('/\b' . $keyword . '\s+/', $keyword . ' ', $sql);
-        }
-
-        return trim($sql);
+        return strtolower(preg_replace('/\s+/', ' ', trim($sql)));
     }
 
     private function assertSQLEquals(string $expected, string $actual): void
@@ -44,304 +22,198 @@ class QueryBuilderTest extends TestCase
         );
     }
 
-    public function testBasicSelect(): void
+    public function testBasicQueryOperations(): void
     {
-        $sql = $this->queryBuilder
-            ->select('id', 'name', 'email')
-            ->toSQL();
+        // Test basic select
+        $this->assertSQLEquals(
+            'SELECT id, name, email FROM users',
+            (new QueryBuilder('users'))->select('id', 'name', 'email')->toSQL()
+        );
 
-        $this->assertSQLEquals('SELECT id, name, email FROM users', $sql);
+        // Test select with where
+        $this->assertSQLEquals(
+            'SELECT * FROM users WHERE age > :age',
+            (new QueryBuilder('users'))->select('*')->where('age > :age', ['age' => 18])->toSQL()
+        );
+
+        // Test multiple conditions
+        $this->assertSQLEquals(
+            'SELECT * FROM users WHERE age > :age AND status = :status OR is_admin = :is_admin',
+            (new QueryBuilder('users'))
+                ->select('*')
+                ->where('age > :age', ['age' => 18])
+                ->andWhere('status = :status', ['status' => 'active'])
+                ->orWhere('is_admin = :is_admin', ['is_admin' => true])
+                ->toSQL()
+        );
+
+        // Test joins
+        $this->assertSQLEquals(
+            'SELECT users.*, profiles.bio FROM users JOIN profiles AS p ON users.id = p.user_id LEFT JOIN addresses AS a ON users.id = a.user_id',
+            (new QueryBuilder('users'))
+                ->select('users.*', 'profiles.bio')
+                ->join('profiles', 'p', 'users.id = p.user_id')
+                ->leftJoin('addresses', 'a', 'users.id = a.user_id')
+                ->toSQL()
+        );
+
+        // Test group by and having
+        $this->assertSQLEquals(
+            'SELECT user_id, COUNT(*) as order_count FROM orders GROUP BY user_id HAVING COUNT(*) > :min_orders',
+            (new QueryBuilder('orders'))
+                ->select('user_id', 'COUNT(*) as order_count')
+                ->groupBy('user_id')
+                ->having('COUNT(*) > :min_orders', ['min_orders' => 5])
+                ->toSQL()
+        );
+
+        // Test order by and limit
+        $this->assertSQLEquals(
+            'SELECT * FROM products ORDER BY price DESC, name LIMIT 10 OFFSET 20',
+            (new QueryBuilder('products'))
+                ->select('*')
+                ->orderBy('price', 'DESC')
+                ->orderBy('name')
+                ->limit(10)
+                ->offset(20)
+                ->toSQL()
+        );
     }
 
-    public function testSelectAll(): void
+    public function testCTEs(): void
     {
-        $sql = $this->queryBuilder
-            ->select()
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT * FROM users', $sql);
-    }
-
-    public function testWhereClause(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('*')
-            ->where('age > :age', ['age' => 18])
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT * FROM users WHERE age > :age', $sql);
-        $this->assertEquals(['age' => 18], $this->queryBuilder->getParams());
-    }
-
-    public function testMultipleWhereClauses(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('*')
-            ->where('age > :age', ['age' => 18])
-            ->andWhere('status = :status', ['status' => 'active'])
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT * FROM users WHERE age > :age AND status = :status', $sql);
-        $this->assertEquals(['age' => 18, 'status' => 'active'], $this->queryBuilder->getParams());
-    }
-
-    public function testOrWhereClause(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('*')
-            ->where('age > :age', ['age' => 18])
-            ->orWhere('status = :status', ['status' => 'active'])
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT * FROM users WHERE age > :age OR status = :status', $sql);
-        $this->assertEquals(['age' => 18, 'status' => 'active'], $this->queryBuilder->getParams());
-    }
-
-    public function testJoinClauses(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('users.*', 'profiles.bio')
-            ->join('profiles', 'users.id = profiles.user_id')
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT users.*, profiles.bio FROM users JOIN profiles ON users.id = profiles.user_id', $sql);
-    }
-
-    public function testLeftJoin(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('users.*', 'profiles.bio')
-            ->leftJoin('profiles', 'users.id = profiles.user_id')
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT users.*, profiles.bio FROM users LEFT JOIN profiles ON users.id = profiles.user_id', $sql);
-    }
-
-    public function testGroupBy(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('department', 'COUNT(*) as count')
-            ->groupBy('department')
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT department, COUNT(*) as count FROM users GROUP BY department', $sql);
-    }
-
-    public function testHaving(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('department', 'COUNT(*) as count')
-            ->groupBy('department')
-            ->having('COUNT(*) > :min_count', ['min_count' => 5])
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT department, COUNT(*) as count FROM users GROUP BY department HAVING COUNT(*) > :min_count', $sql);
-        $this->assertEquals(['min_count' => 5], $this->queryBuilder->getParams());
-    }
-
-    public function testOrderBy(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('*')
-            ->orderBy('name', 'ASC')
-            ->orderBy('created_at', 'DESC')
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT * FROM users ORDER BY name ASC, created_at DESC', $sql);
-    }
-
-    public function testLimitAndOffset(): void
-    {
-        $sql = $this->queryBuilder
-            ->select('*')
-            ->limit(10)
-            ->offset(20)
-            ->toSQL();
-
-        $this->assertSQLEquals('SELECT * FROM users LIMIT 10 OFFSET 20', $sql);
-    }
-
-    public function testWithCTE(): void
-    {
+        // Test basic CTE
         $subQuery = new QueryBuilder('orders');
         $subQuery->select('user_id', 'SUM(amount) as total_amount')
             ->groupBy('user_id');
 
-        $sql = $this->queryBuilder
+        $query = new QueryBuilder('users');
+        $query->with('user_totals', $subQuery)
             ->select('users.*', 'user_totals.total_amount')
-            ->with('user_totals', $subQuery)
-            ->join('user_totals', 'users.id = user_totals.user_id')
-            ->toSQL();
+            ->join('user_totals', 'ut', 'users.id = ut.user_id');
 
-        $expected = 'WITH user_totals AS (SELECT user_id, SUM(amount) as total_amount FROM orders GROUP BY user_id) '
-            . 'SELECT users.*, user_totals.total_amount FROM users JOIN user_totals ON users.id = user_totals.user_id';
+        $this->assertSQLEquals(
+            'WITH user_totals AS (SELECT user_id, SUM(amount) as total_amount FROM orders GROUP BY user_id) SELECT users.*, user_totals.total_amount FROM users JOIN user_totals AS ut ON users.id = ut.user_id',
+            $query->toSQL()
+        );
 
-        $this->assertSQLEquals($expected, $sql);
+        // Test recursive CTE
+        $baseQuery = new QueryBuilder('categories');
+        $baseQuery->select('id', 'name', 'parent_id')
+            ->where('parent_id IS NULL');
+
+        $recursiveQuery = new QueryBuilder();
+        $recursiveQuery->select('c.id', 'c.name', 'c.parent_id')
+            ->from('categories', 'c')
+            ->join('category_tree', 'ct', 'c.parent_id = ct.id');
+
+        $query = new QueryBuilder();
+        $query->withRecursive('category_tree', $baseQuery, $recursiveQuery)
+            ->select('*')
+            ->from('category_tree');
+
+        $this->assertSQLEquals(
+            'WITH RECURSIVE category_tree AS (SELECT id, name, parent_id FROM categories WHERE parent_id IS NULL UNION ALL SELECT c.id, c.name, c.parent_id FROM categories AS c JOIN category_tree AS ct ON c.parent_id = ct.id) SELECT * FROM category_tree',
+            $query->toSQL()
+        );
     }
 
-    public function testComplexQuery(): void
+    public function testDMLOperations(): void
     {
-        $sql = $this->queryBuilder
-            ->select('users.id', 'users.name', 'COUNT(orders.id) as order_count')
-            ->join('orders', 'users.id = orders.user_id')
-            ->where('users.status = :status', ['status' => 'active'])
-            ->groupBy('users.id', 'users.name')
-            ->having('COUNT(orders.id) > :min_orders', ['min_orders' => 5])
-            ->orderBy('order_count', 'DESC')
-            ->limit(10)
-            ->toSQL();
+        // Test INSERT
+        $query = new QueryBuilder();
+        $query->insert('users')
+            ->values([
+                'name' => ':name',
+                'email' => ':email',
+                'age' => ':age'
+            ])
+            ->setParameter('name', 'John Doe')
+            ->setParameter('email', 'john@example.com')
+            ->setParameter('age', 30);
 
-        $expected = 'SELECT users.id, users.name, COUNT(orders.id) as order_count FROM users '
-            . 'JOIN orders ON users.id = orders.user_id '
-            . 'WHERE users.status = :status '
-            . 'GROUP BY users.id, users.name '
-            . 'HAVING COUNT(orders.id) > :min_orders '
-            . 'ORDER BY order_count DESC '
-            . 'LIMIT 10';
+        $this->assertSQLEquals(
+            'INSERT INTO users (name, email, age) VALUES (:name, :email, :age)',
+            $query->toSQL()
+        );
 
-        $this->assertSQLEquals($expected, $sql);
-        $this->assertEquals(['status' => 'active', 'min_orders' => 5], $this->queryBuilder->getParams());
+        // Test UPDATE
+        $query = new QueryBuilder();
+        $query->update('users')
+            ->set([
+                'name' => ':new_name',
+                'email' => ':new_email'
+            ])
+            ->where('id = :id', ['id' => 1])
+            ->setParameter('new_name', 'Jane Doe')
+            ->setParameter('new_email', 'jane@example.com');
+
+        $this->assertSQLEquals(
+            'UPDATE users SET name = :new_name, email = :new_email WHERE id = :id',
+            $query->toSQL()
+        );
+
+        // Test DELETE
+        $query = new QueryBuilder();
+        $query->delete('users')
+            ->where('id = :id', ['id' => 1]);
+
+        $this->assertSQLEquals(
+            'DELETE FROM users WHERE id = :id',
+            $query->toSQL()
+        );
     }
 
-    public function testComplexRecursiveEventQuery(): void
+    public function testSubqueries(): void
     {
-        $eventGeneratorBase = new QueryBuilder('schema.events');
-        $eventGeneratorBase->select(
-            'id',
-            'uuid',
-            'name',
-            'description',
-            'start_date::DATE',
-            'start_date::DATE AS first_event_date',
-            'AGE(start_date, start_date) AS first_event_age',
-            'start_time',
-            'end_time',
-            'recurrence_type',
-            'recurrence_frequency',
-            'occurrence_number',
-            'event_category_id',
-            'created_at'
-        )
-        ->where('occurrence_number = :occurrence_number', ['occurrence_number' => 1])
-        ->andWhere('AGE(start_date, CURRENT_DATE) < :interval', ['interval' => "INTERVAL '1 year'"]);
+        // Test subquery in WHERE clause
+        $subQuery = new QueryBuilder('orders');
+        $subQuery->select('user_id')
+            ->where('total > :min_total', ['min_total' => 1000]);
 
-        $eventGeneratorRecursive = new QueryBuilder();
-        $eventGeneratorRecursive->select(
-            'rg.id',
-            'rg.uuid',
-            'rg.name',
-            'rg.description',
-            "(CASE\n                WHEN rg.recurrence_frequency = 'daily' THEN rg.start_date + INTERVAL '1 day'\n                WHEN rg.recurrence_frequency = 'weekly' THEN rg.start_date + INTERVAL '1 week'\n                WHEN rg.recurrence_frequency = 'monthly' THEN rg.start_date + INTERVAL '1 month'\n            END)::DATE AS start_date",
-            'rg.first_event_date',
-            'AGE(rg.start_date, rg.first_event_date) AS first_event_age',
-            'rg.start_time',
-            'rg.end_time',
-            'rg.recurrence_type',
-            'rg.recurrence_frequency',
-            'rg.occurrence_number + 1 AS occurrence_number',
-            'rg.event_category_id',
-            'rg.created_at'
-        )
-        ->from('event_generator rg')
-        ->where("rg.recurrence_type = 'recurring'")
-        ->andWhere("AGE(rg.start_date, rg.first_event_date) < INTERVAL '1 year'");
+        $query = new QueryBuilder('users');
+        $query->select('*')
+            ->where('id IN :user_ids', ['user_ids' => $subQuery]);
 
-        // Create the final events CTE
-        $finalEventsQuery = new QueryBuilder();
-        $finalEventsQuery->select(
-            'gen.id',
-            'gen.uuid',
-            'COALESCE(uniq.name, gen.name) AS name',
-            'COALESCE(uniq.description, gen.description) AS description',
-            'COALESCE(uniq.start_date, gen.start_date) AS start_date',
-            'gen.first_event_date',
-            'gen.first_event_age',
-            'COALESCE(uniq.start_time, gen.start_time) AS start_time',
-            'COALESCE(uniq.end_time, gen.end_time) AS end_time',
-            'COALESCE(uniq.recurrence_type, gen.recurrence_type) AS recurrence_type',
-            'COALESCE(uniq.recurrence_frequency, gen.recurrence_frequency) AS recurrence_frequency',
-            'COALESCE(uniq.occurrence_number, gen.occurrence_number) AS occurrence_number',
-            'gen.event_category_id',
-            'uniq.occurrence_number AS unique_occurrence_number',
-            'COALESCE(uniq.created_at, gen.created_at) AS created_at'
-        )
-        ->from('event_generator gen')
-        ->leftJoin('schema.events uniq', "gen.uuid = uniq.uuid AND uniq.recurrence_type = 'unique' AND gen.occurrence_number = uniq.occurrence_number");
+        $this->assertSQLEquals(
+            'SELECT * FROM users WHERE id IN (SELECT user_id FROM orders WHERE total > :min_total)',
+            $query->toSQL()
+        );
 
-        // Create the main query
-        $mainQuery = new QueryBuilder();
+        // Test subquery in SELECT clause
+        $avgQuery = new QueryBuilder('products');
+        $avgQuery->select('AVG(price)');
 
-        // Add the CTEs to the main query
-        $mainQuery->withRecursive('event_generator', $eventGeneratorBase, $eventGeneratorRecursive)
-            ->with('final_events', $finalEventsQuery);
+        $query = new QueryBuilder('products');
+        $query->select('name', 'price')
+            ->where('price > :avg_price', ['avg_price' => $avgQuery]);
 
-        $mainQuery->select(
-            'id',
-            'uuid',
-            'name',
-            'description',
-            'start_date',
-            'start_time',
-            'end_time',
-            'recurrence_type',
-            'recurrence_frequency',
-            'occurrence_number',
-            'event_category_id',
-            'created_at'
-        )
-        ->from('final_events')
-        ->where('start_date >= :start_date', ['start_date' => '2024-01-01'])
-        ->andWhere('start_date <= :end_date', ['end_date' => '2024-12-31'])
-        ->orderBy('start_date', 'ASC');
+        $this->assertSQLEquals(
+            'SELECT name, price FROM products WHERE price > (SELECT AVG(price) FROM products)',
+            $query->toSQL()
+        );
+    }
 
-        $expectedSQL = <<<'SQL'
-WITH RECURSIVE event_generator AS (
-    SELECT id, uuid, name, description, start_date::DATE, start_date::DATE AS first_event_date,
-           AGE(start_date, start_date) AS first_event_age, start_time, end_time, recurrence_type,
-           recurrence_frequency, occurrence_number, event_category_id, created_at
-    FROM schema.events
-    WHERE occurrence_number = :occurrence_number AND AGE(start_date, CURRENT_DATE) < :interval
-    UNION ALL
-    SELECT rg.id, rg.uuid, rg.name, rg.description,
-           (CASE
-                WHEN rg.recurrence_frequency = 'daily' THEN rg.start_date + INTERVAL '1 day'
-                WHEN rg.recurrence_frequency = 'weekly' THEN rg.start_date + INTERVAL '1 week'
-                WHEN rg.recurrence_frequency = 'monthly' THEN rg.start_date + INTERVAL '1 month'
-            END)::DATE AS start_date,
-           rg.first_event_date, AGE(rg.start_date, rg.first_event_date) AS first_event_age,
-           rg.start_time, rg.end_time, rg.recurrence_type, rg.recurrence_frequency,
-           rg.occurrence_number + 1 AS occurrence_number, rg.event_category_id, rg.created_at
-    FROM event_generator rg
-    WHERE rg.recurrence_type = 'recurring' AND AGE(rg.start_date, rg.first_event_date) < INTERVAL '1 year'
-), final_events AS (
-    SELECT gen.id, gen.uuid, COALESCE(uniq.name, gen.name) AS name,
-           COALESCE(uniq.description, gen.description) AS description,
-           COALESCE(uniq.start_date, gen.start_date) AS start_date, gen.first_event_date,
-           gen.first_event_age, COALESCE(uniq.start_time, gen.start_time) AS start_time,
-           COALESCE(uniq.end_time, gen.end_time) AS end_time,
-           COALESCE(uniq.recurrence_type, gen.recurrence_type) AS recurrence_type,
-           COALESCE(uniq.recurrence_frequency, gen.recurrence_frequency) AS recurrence_frequency,
-           COALESCE(uniq.occurrence_number, gen.occurrence_number) AS occurrence_number,
-           gen.event_category_id, uniq.occurrence_number AS unique_occurrence_number,
-           COALESCE(uniq.created_at, gen.created_at) AS created_at
-    FROM event_generator gen
-    LEFT JOIN schema.events uniq ON gen.uuid = uniq.uuid AND uniq.recurrence_type = 'unique' AND gen.occurrence_number = uniq.occurrence_number
-)
-SELECT id, uuid, name, description, start_date, start_time, end_time, recurrence_type,
-       recurrence_frequency, occurrence_number, event_category_id, created_at
-FROM final_events
-WHERE start_date >= :start_date AND start_date <= :end_date
-ORDER BY start_date ASC
-SQL;
+    public function testParameterHandling(): void
+    {
+        $query = new QueryBuilder('users');
+        $query->select('*')
+            ->where('id = :id', ['id' => 1])
+            ->setParameter('name', 'John Doe');
 
-        $expectedParams = [
-            'occurrence_number' => 1,
-            'interval' => "INTERVAL '1 year'",
-            'start_date' => '2024-01-01',
-            'end_date' => '2024-12-31',
-        ];
+        $this->assertEquals(
+            ['id' => 1, 'name' => 'John Doe'],
+            $query->getParams()
+        );
 
-        $this->assertSQLEquals($expectedSQL, $mainQuery->toSQL());
-        $this->assertEquals($expectedParams, $mainQuery->getParams());
+        // Test array parameters
+        $query = new QueryBuilder('users');
+        $query->select('*')
+            ->where('id IN :ids', ['ids' => [1, 2, 3]]);
+
+        $this->assertSQLEquals(
+            'SELECT * FROM users WHERE id IN (:ids)',
+            $query->toSQL()
+        );
     }
 }
