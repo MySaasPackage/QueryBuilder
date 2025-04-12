@@ -32,6 +32,7 @@ class QueryBuilder
     {
         if (empty($columns)) {
             $this->selectClauses = ['*'];
+
             return $this;
         }
 
@@ -63,18 +64,18 @@ class QueryBuilder
         $qCount = substr_count($condition, '?');
         if ($qCount > 0) {
             $offset = count($this->params);
-            for ($i = 0; $i < $qCount; $i++) {
+            for ($i = 0; $i < $qCount; ++$i) {
                 $pos = strpos($condition, '?');
-                $paramName = (string)($offset + $i);
-                
+                $paramName = (string) ($offset + $i);
+
                 // Check if this is an IN clause
                 $inClauseCheck = substr($condition, max(0, $pos - 4), 4);
-                if (strtoupper($inClauseCheck) === ' IN ') {
+                if (' IN ' === strtoupper($inClauseCheck)) {
                     $condition = substr_replace($condition, "(:{$paramName})", $pos, 1);
                 } else {
                     $condition = substr_replace($condition, ":{$paramName}", $pos, 1);
                 }
-                
+
                 if (isset($params[$i])) {
                     $this->params[$paramName] = $params[$i];
                 }
@@ -89,18 +90,19 @@ class QueryBuilder
             } elseif (is_array($value)) {
                 $this->params[$key] = $value;
                 // Check if this is an IN clause
-                if (strpos($condition, " IN :$key") !== false) {
+                if (false !== strpos($condition, " IN :$key")) {
                     $condition = str_replace(" IN :$key", " IN (:$key)", $condition);
                 }
             } else {
                 if (is_int($key)) {
-                    $key = (string)$key;
+                    $key = (string) $key;
                 }
                 $this->params[$key] = $value;
             }
         }
 
         $this->whereClauses[] = $condition;
+
         return $this;
     }
 
@@ -111,7 +113,7 @@ class QueryBuilder
 
     public function orWhere(
         string $condition,
-        array $params = []
+        array $params = [],
     ): self {
         if (!empty($this->whereClauses)) {
             $condition = "OR {$condition}";
@@ -126,7 +128,7 @@ class QueryBuilder
     public function join(
         string $table,
         string $alias,
-        string $condition
+        string $condition,
     ): self {
         $this->joinClauses[] = "JOIN {$table} AS {$alias} ON {$condition}";
 
@@ -136,7 +138,7 @@ class QueryBuilder
     public function leftJoin(
         string $table,
         string $alias,
-        string $condition
+        string $condition,
     ): self {
         $this->joinClauses[] = "LEFT JOIN {$table} AS {$alias} ON {$condition}";
 
@@ -146,7 +148,7 @@ class QueryBuilder
     public function rightJoin(
         string $table,
         string $alias,
-        string $condition
+        string $condition,
     ): self {
         $this->joinClauses[] = "RIGHT JOIN {$table} AS {$alias} ON {$condition}";
 
@@ -162,7 +164,7 @@ class QueryBuilder
 
     public function having(
         string $condition,
-        array $params = []
+        array $params = [],
     ): self {
         $this->havingClauses[] = $condition;
         $this->params = array_merge($this->params, $params);
@@ -173,6 +175,7 @@ class QueryBuilder
     public function orderBy(string $column, ?string $direction = null): self
     {
         $this->orderByClauses[] = $direction ? "{$column} {$direction}" : $column;
+
         return $this;
     }
 
@@ -194,14 +197,14 @@ class QueryBuilder
         string $name,
         QueryBuilder $query,
         array $columns = [],
-        bool $recursive = false
+        bool $recursive = false,
     ): self {
         $this->ctes[] = [
             'name' => $name,
             'query' => $query,
             'columns' => $columns,
             'recursive' => $recursive,
-            'union' => false
+            'union' => false,
         ];
 
         // Merge parameters from the CTE query
@@ -214,7 +217,7 @@ class QueryBuilder
         string $name,
         QueryBuilder $baseQuery,
         QueryBuilder $recursiveQuery,
-        array $columns = []
+        array $columns = [],
     ): self {
         // Add the anchor part
         $this->ctes[] = [
@@ -222,7 +225,7 @@ class QueryBuilder
             'query' => $baseQuery,
             'columns' => $columns,
             'recursive' => true,
-            'union' => false
+            'union' => false,
         ];
 
         // Add the recursive part
@@ -231,7 +234,7 @@ class QueryBuilder
             'query' => $recursiveQuery,
             'columns' => $columns,
             'recursive' => true,
-            'union' => true
+            'union' => true,
         ];
 
         $this->params = array_merge($this->params, $baseQuery->getParams(), $recursiveQuery->getParams());
@@ -254,19 +257,19 @@ class QueryBuilder
                 $isRecursive = true;
             }
 
-            if ($currentGroup === null || $currentGroup['name'] !== $cte['name']) {
-                if ($currentGroup !== null) {
+            if (null === $currentGroup || $currentGroup['name'] !== $cte['name']) {
+                if (null !== $currentGroup) {
                     $cteGroups[] = $this->buildCTEGroup($currentGroup);
                 }
                 $currentGroup = [
                     'name' => $cte['name'],
-                    'parts' => []
+                    'parts' => [],
                 ];
             }
             $currentGroup['parts'][] = $cte;
         }
 
-        if ($currentGroup !== null) {
+        if (null !== $currentGroup) {
             $cteGroups[] = $this->buildCTEGroup($currentGroup);
         }
 
@@ -281,7 +284,7 @@ class QueryBuilder
         foreach ($group['parts'] as $index => $cte) {
             $columnDef = !empty($cte['columns']) ? '(' . implode(', ', $cte['columns']) . ')' : '';
             $sql = $cte['query']->toSQL();
-            $parts[] = $index === 0 ? $sql : 'UNION ALL ' . $sql;
+            $parts[] = 0 === $index ? $sql : 'UNION ALL ' . $sql;
         }
 
         return $group['name'] . $columnDef . ' AS (' . implode(' ', $parts) . ')';
@@ -339,11 +342,11 @@ class QueryBuilder
         }
 
         // Add LIMIT and OFFSET if present
-        if ($this->limitValue !== null) {
+        if (null !== $this->limitValue) {
             $sql[] = "LIMIT {$this->limitValue}";
         }
 
-        if ($this->offsetValue !== null) {
+        if (null !== $this->offsetValue) {
             $sql[] = "OFFSET {$this->offsetValue}";
         }
 
@@ -366,7 +369,7 @@ class QueryBuilder
     private function buildUpdateSQL(): string
     {
         $sets = array_map(
-            fn($column, $value) => "{$column} = {$value}",
+            fn ($column, $value) => "{$column} = {$value}",
             array_keys($this->values),
             array_values($this->values)
         );
@@ -412,9 +415,10 @@ class QueryBuilder
     public function setParameter(string|int $key, mixed $value): self
     {
         if (is_int($key)) {
-            $key = (string)$key;
+            $key = (string) $key;
         }
         $this->params[$key] = $value;
+
         return $this;
     }
 
@@ -422,12 +426,14 @@ class QueryBuilder
     {
         $this->operation = 'insert';
         $this->table = $table;
+
         return $this;
     }
 
     public function values(array $values): self
     {
         $this->values = $values;
+
         return $this;
     }
 
@@ -435,12 +441,14 @@ class QueryBuilder
     {
         $this->operation = 'update';
         $this->table = $table;
+
         return $this;
     }
 
     public function set(array $values): self
     {
         $this->values = $values;
+
         return $this;
     }
 
@@ -448,6 +456,7 @@ class QueryBuilder
     {
         $this->operation = 'delete';
         $this->table = $table;
+
         return $this;
     }
 }

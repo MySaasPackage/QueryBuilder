@@ -126,7 +126,7 @@ class QueryBuilderTest extends TestCase
             ->values([
                 'name' => ':name',
                 'email' => ':email',
-                'age' => ':age'
+                'age' => ':age',
             ])
             ->setParameter('name', 'John Doe')
             ->setParameter('email', 'john@example.com')
@@ -142,7 +142,7 @@ class QueryBuilderTest extends TestCase
         $query->update('users')
             ->set([
                 'name' => ':new_name',
-                'email' => ':new_email'
+                'email' => ':new_email',
             ])
             ->where('id = :id', ['id' => 1])
             ->setParameter('new_name', 'Jane Doe')
