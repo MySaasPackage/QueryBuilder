@@ -137,6 +137,20 @@ class QueryBuilderTest extends TestCase
             $query->toSQL()
         );
 
+        // Test INSERT with RETURNING
+        $query = new QueryBuilder();
+        $query->insert('users')
+            ->values([
+                'name' => ':name',
+                'email' => ':email',
+            ])
+            ->returning('id', 'name', 'email');
+
+        $this->assertSQLEquals(
+            'INSERT INTO users (name, email) VALUES (:name, :email) RETURNING id, name, email',
+            $query->toSQL()
+        );
+
         // Test UPDATE
         $query = new QueryBuilder();
         $query->update('users')
@@ -153,6 +167,18 @@ class QueryBuilderTest extends TestCase
             $query->toSQL()
         );
 
+        // Test UPDATE with RETURNING
+        $query = new QueryBuilder();
+        $query->update('users')
+            ->set(['name' => ':new_name'])
+            ->where('id = :id')
+            ->returning('id', 'name', 'updated_at');
+
+        $this->assertSQLEquals(
+            'UPDATE users SET name = :new_name WHERE id = :id RETURNING id, name, updated_at',
+            $query->toSQL()
+        );
+
         // Test DELETE
         $query = new QueryBuilder();
         $query->delete('users')
@@ -160,6 +186,17 @@ class QueryBuilderTest extends TestCase
 
         $this->assertSQLEquals(
             'DELETE FROM users WHERE id = :id',
+            $query->toSQL()
+        );
+
+        // Test DELETE with RETURNING
+        $query = new QueryBuilder();
+        $query->delete('users')
+            ->where('id = :id')
+            ->returning('id', 'name', 'email');
+
+        $this->assertSQLEquals(
+            'DELETE FROM users WHERE id = :id RETURNING id, name, email',
             $query->toSQL()
         );
     }
@@ -214,6 +251,42 @@ class QueryBuilderTest extends TestCase
         $this->assertSQLEquals(
             'SELECT * FROM users WHERE id IN (:ids)',
             $query->toSQL()
+        );
+
+        // Test setParameters method
+        $query = new QueryBuilder('users');
+        $query->select('*')
+            ->setParameters([
+                'name' => 'John Doe',
+                'age' => 30,
+                'email' => 'john@example.com'
+            ]);
+
+        $this->assertEquals(
+            [
+                'name' => 'John Doe',
+                'age' => 30,
+                'email' => 'john@example.com'
+            ],
+            $query->getParams()
+        );
+
+        // Test setParameters with existing parameters
+        $query = new QueryBuilder('users');
+        $query->select('*')
+            ->where('id = :id', ['id' => 1])
+            ->setParameters([
+                'name' => 'John Doe',
+                'age' => 30
+            ]);
+
+        $this->assertEquals(
+            [
+                'id' => 1,
+                'name' => 'John Doe',
+                'age' => 30
+            ],
+            $query->getParams()
         );
     }
 }

@@ -20,6 +20,7 @@ class QueryBuilder
     private ?int $offsetValue = null;
     private array $values = [];
     private string $operation = 'select';
+    private array $returningClauses = [];
 
     public function __construct(?string $table = null)
     {
@@ -358,12 +359,14 @@ class QueryBuilder
         $columns = array_keys($this->values);
         $values = array_values($this->values);
 
-        return sprintf(
+        $sql = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->table,
             implode(', ', $columns),
             implode(', ', $values)
         );
+
+        return $sql . $this->buildReturningSQL();
     }
 
     private function buildUpdateSQL(): string
@@ -380,7 +383,7 @@ class QueryBuilder
             $sql .= ' WHERE ' . implode(' ', $this->whereClauses);
         }
 
-        return $sql;
+        return $sql . $this->buildReturningSQL();
     }
 
     private function buildDeleteSQL(): string
@@ -391,7 +394,7 @@ class QueryBuilder
             $sql .= ' WHERE ' . implode(' ', $this->whereClauses);
         }
 
-        return $sql;
+        return $sql . $this->buildReturningSQL();
     }
 
     private function formatValue($value): string
@@ -418,6 +421,15 @@ class QueryBuilder
             $key = (string) $key;
         }
         $this->params[$key] = $value;
+
+        return $this;
+    }
+
+    public function setParameters(array $params): self
+    {
+        foreach ($params as $key => $value) {
+            $this->setParameter($key, $value);
+        }
 
         return $this;
     }
@@ -458,5 +470,20 @@ class QueryBuilder
         $this->table = $table;
 
         return $this;
+    }
+
+    public function returning(string ...$columns): self
+    {
+        $this->returningClauses = $columns;
+        return $this;
+    }
+
+    private function buildReturningSQL(): string
+    {
+        if (empty($this->returningClauses)) {
+            return '';
+        }
+
+        return ' RETURNING ' . implode(', ', $this->returningClauses);
     }
 }
